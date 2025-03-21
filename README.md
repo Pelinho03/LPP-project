@@ -1,4 +1,4 @@
-# 🗂️ [Nome do Projeto]
+# 🗂️ LPP-Project (provisório)
 
 Este repositório contém a implementação de um sistema desenvolvido para a unidade curricular de Linguagens e Paradigmas da Programação do curso de Engenharia Informática. O projeto visa identificar um problema computacional relevante e apresentar uma solução funcional em **Java** ou **Python**, documentando todo o processo.
 
@@ -130,4 +130,4 @@ Este projeto é uma oportunidade para aplicar conceitos de programação em **Ja
 
 ---
 
-Feito por [Teu Nome](https://github.com/Pelinho03)
+Feito por [Paulo  Guimarães](https://github.com/Pelinho03)
