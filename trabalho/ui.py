@@ -1,18 +1,23 @@
 import datetime
 from PyQt6.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QPushButton, QListWidget, 
-    QHBoxLayout, QLabel, QLineEdit, QTextEdit, QComboBox, QDateEdit, QMessageBox
+    QApplication, QWidget, QVBoxLayout, QPushButton, QListWidget,
+    QHBoxLayout, QLineEdit, QTextEdit, QComboBox, QDateEdit, QMessageBox, QInputDialog
 )
-from storage import carregar_tarefas, guardar_tarefas
-from models import Tarefa
-from notifications import notificar_tarefa
 from PyQt6.QtCore import Qt, QDate
+from storage import carregar_tarefas, guardar_tarefas
+from storage_users import carregar_utilizadores, guardar_utilizadores
+from models import Tarefa
+from users import User
+from notifications import notificar_tarefa
+
 
 # Interface gráfica
 class GestorTarefas(QWidget):
-    
+
     def __init__(self):
         super().__init__()
+        self.utilizadores = carregar_utilizadores()
+        self.tarefas = carregar_tarefas(self.utilizadores)
         self.setWindowTitle("Gestor de Tarefas")
         self.setGeometry(400, 200, 700, 400)
         self.layout = QVBoxLayout()
@@ -36,13 +41,31 @@ class GestorTarefas(QWidget):
         self.campo_descricao.setPlaceholderText("Descrição")
         self.layout.addWidget(self.campo_descricao)
 
+        # self.campo_prioridade = QComboBox()
+        # self.campo_prioridade.addItems(["Alta", "Média", "Baixa"])
+        # self.layout.addWidget(self.campo_prioridade)
+
+        # Botões de prioridade e utilizador
+        botoes_prioridade_ordenação = QHBoxLayout()
         self.campo_prioridade = QComboBox()
         self.campo_prioridade.addItems(["Alta", "Média", "Baixa"])
-        self.layout.addWidget(self.campo_prioridade)
+        botoes_prioridade_ordenação.addWidget(self.campo_prioridade)
+
+        self.campo_utilizador = QComboBox()
+        botoes_prioridade_ordenação.addWidget(self.campo_utilizador)
+
+        self.btn_criar_utilizador = QPushButton("Criar Utilizador")
+        self.btn_criar_utilizador.clicked.connect(self.criar_utilizador)
+        botoes_prioridade_ordenação.addWidget(self.btn_criar_utilizador)
+
+        self.atualizar_utilizadores()
+
+        self.layout.addLayout(botoes_prioridade_ordenação)
 
         # Campo de prazo
         self.campo_prazo = QDateEdit()
         self.campo_prazo.setDisplayFormat("dd/MM/yyyy")
+        self.campo_prazo.setDate(QDate.currentDate())
         self.layout.addWidget(self.campo_prazo)
 
         # Botão Adicionar
@@ -63,8 +86,22 @@ class GestorTarefas(QWidget):
         self.btn_editar = QPushButton("Editar Tarefa")
         self.btn_editar.clicked.connect(self.editar_tarefa)
         botoes_layout.addWidget(self.btn_editar)
-        
+
         self.layout.addLayout(botoes_layout)
+
+        # Botões de ordenação
+        botoes_ordenacao = QHBoxLayout()
+        self.btn_ordenar_prioridade = QPushButton("Ordenar por Prioridade")
+        self.btn_ordenar_prioridade.clicked.connect(
+            self.ordenar_por_prioridade)
+        botoes_ordenacao.addWidget(self.btn_ordenar_prioridade)
+
+        self.btn_ordenar_data = QPushButton("Ordenar por Data")
+        self.btn_ordenar_data.clicked.connect(self.ordenar_por_data)
+        botoes_ordenacao.addWidget(self.btn_ordenar_data)
+
+        self.layout.addLayout(botoes_ordenacao)
+
         self.setLayout(self.layout)
         self.tarefas = carregar_tarefas()
         self.atualizar_lista()
@@ -72,14 +109,14 @@ class GestorTarefas(QWidget):
     def atualizar_lista(self, filtro=None):
         self.lista_tarefas.clear()
         tarefas_filtradas = self.tarefas
-
         if filtro:
-            tarefas_filtradas = [tarefa for tarefa in self.tarefas if filtro.lower() in tarefa.titulo.lower()]
-
-        for tarefa in sorted(tarefas_filtradas, key=lambda t: t.prioridade, reverse=True):
+            tarefas_filtradas = [
+                t for t in self.tarefas if filtro.lower() in t.titulo.lower()]
+        for tarefa in tarefas_filtradas:
             status = "[✔]" if tarefa.concluida else "[ ]"
             prazo = tarefa.prazo if tarefa.prazo else "Sem prazo"
-            self.lista_tarefas.addItem(f"{status} {tarefa.titulo} - {tarefa.prioridade} - {prazo}")
+            self.lista_tarefas.addItem(
+                f"{status} {tarefa.titulo} - {tarefa.prioridade} - {prazo}")
 
     def pesquisar_tarefa(self):
         texto_pesquisa = self.campo_pesquisa.text()
@@ -89,20 +126,44 @@ class GestorTarefas(QWidget):
         titulo = self.campo_titulo.text()
         descricao = self.campo_descricao.toPlainText()
         prioridade = self.campo_prioridade.currentText()
-        prazo = self.campo_prazo.date().toString("yyyy-MM-dd") if self.campo_prazo.date().isValid() else None
+        prazo = self.campo_prazo.date().toString(
+            "yyyy-MM-dd") if self.campo_prazo.date().isValid() else None
 
-        if not titulo:
-            QMessageBox.warning(self, "Erro", "O título da tarefa não pode estar vazio.")
+        utilizador_nome = self.campo_utilizador.currentText()
+        utilizador = next(
+            (u for u in self.utilizadores if u.nome == utilizador_nome), None)
+
+        if prazo and QDate.currentDate() > self.campo_prazo.date():
+            QMessageBox.warning(
+                self, "Erro", "A data de prazo não pode ser anterior à data atual.")
             return
 
-        nova_tarefa = Tarefa(len(self.tarefas) + 1, titulo, descricao, prioridade, prazo)
+        if not titulo:
+            QMessageBox.warning(
+                self, "Erro", "O título da tarefa não pode estar vazio.")
+            return
+
+        nova_tarefa = Tarefa(
+            len(self.tarefas) + 1,
+            titulo,
+            descricao,
+            prioridade,
+            prazo,
+            False,
+            utilizador
+        )
+
         self.tarefas.append(nova_tarefa)
         guardar_tarefas(self.tarefas)
         self.atualizar_lista()
         self.notificar_tarefa(nova_tarefa)
+
         self.campo_titulo.clear()
         self.campo_descricao.clear()
         self.campo_prazo.clear()
+
+    def notificar_tarefa(self, tarefa):
+        print(f"Notificando tarefa: {tarefa.titulo}")
 
     def remover_tarefa(self):
         index = self.lista_tarefas.currentRow()
@@ -125,27 +186,72 @@ class GestorTarefas(QWidget):
             self.campo_titulo.setText(tarefa.titulo)
             self.campo_descricao.setText(tarefa.descricao)
             self.campo_prioridade.setCurrentText(tarefa.prioridade)
-            self.campo_prazo.setDate(datetime.datetime.strptime(tarefa.prazo, "%Y-%m-%d") if tarefa.prazo else QDateEdit().date())
 
-            # Verificar se o botão de salvar já existe, e removê-lo antes de adicionar um novo
+            if tarefa.prazo:
+                data = datetime.datetime.strptime(tarefa.prazo, "%Y-%m-%d")
+                self.campo_prazo.setDate(
+                    QDate(data.year, data.month, data.day))
+            else:
+                self.campo_prazo.setDate(QDate.currentDate())
+
+            # Remover botão antigo, se existir
             if hasattr(self, 'btn_salvar_edicao'):
-                self.btn_salvar_edicao.deleteLater()  # Remove o botão antigo
+                self.btn_salvar_edicao.setParent(None)
+                self.btn_salvar_edicao.deleteLater()
+
+            # Criar botão de salvar edição
+            self.btn_salvar_edicao = QPushButton("Salvar Edição")
+            self.layout.addWidget(self.btn_salvar_edicao)
 
             def salvar_edicao():
                 tarefa.titulo = self.campo_titulo.text()
                 tarefa.descricao = self.campo_descricao.toPlainText()
                 tarefa.prioridade = self.campo_prioridade.currentText()
-                tarefa.prazo = self.campo_prazo.date().toString("yyyy-MM-dd") if self.campo_prazo.date().isValid() else ""
+                tarefa.prazo = self.campo_prazo.date().toString(
+                    "yyyy-MM-dd") if self.campo_prazo.date().isValid() else ""
                 guardar_tarefas(self.tarefas)
                 self.atualizar_lista()
-                QMessageBox.information(self, "Sucesso", "Tarefa editada com sucesso!")
+                QMessageBox.information(
+                    self, "Sucesso", "Tarefa editada com sucesso!")
+                self.btn_salvar_edicao.hide()  # Esconde o botão depois de salvar
 
-            self.btn_salvar_edicao = QPushButton("Salvar Edição")
-            self.layout.addWidget(self.btn_salvar_edicao)
             self.btn_salvar_edicao.clicked.connect(salvar_edicao)
 
+    def ordenar_por_prioridade(self):
+        prioridades = {"Alta": 0, "Média": 1, "Baixa": 2}
+        self.tarefas.sort(key=lambda t: prioridades.get(t.prioridade, 3))
+        self.atualizar_lista()
 
-#interligar tarefas 
-#antecipar o termino das tarefas
-#ordenar por prioridade/data
-#fazer verificação de datas
+    def ordenar_por_data(self):
+        def converter_data(tarefa):
+            try:
+                return datetime.datetime.strptime(tarefa.prazo, "%Y-%m-%d") if tarefa.prazo else datetime.datetime.max
+            except Exception:
+                return datetime.datetime.max
+        self.tarefas.sort(key=converter_data)
+        self.atualizar_lista()
+
+    def atualizar_utilizadores(self):
+        self.campo_utilizador.clear()
+        for user in self.utilizadores:
+            self.campo_utilizador.addItem(user.nome)
+
+    def criar_utilizador(self):
+        nome, ok_nome = QInputDialog.getText(
+            self, "Criar Utilizador", "Nome do Utilizador:")
+        if not ok_nome or not nome.strip():
+            QMessageBox.warning(
+                self, "Erro", "O nome do Utilizador não pode estar vazio.")
+            return
+
+        email, ok_email = QInputDialog.getText(
+            self, "Criar Utilizador", "Email do Utilizador:")
+        if not ok_email or not email.strip():
+            QMessageBox.warning(
+                self, "Erro", "O email do Utilizador não pode estar vazio.")
+            return
+
+        novo_user = User(nome.strip(), email.strip())
+        self.utilizadores.append(novo_user)
+        guardar_utilizadores(self.utilizadores)
+        self.atualizar_utilizadores()
