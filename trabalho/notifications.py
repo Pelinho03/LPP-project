@@ -1,6 +1,7 @@
 from plyer import notification
 
-def notificar_tarefa(self, tarefa):
+
+def notificar_tarefa(tarefa):
     if tarefa.prioridade == "Alta":
         notification.notify(
             title="Tarefa Importante!",
