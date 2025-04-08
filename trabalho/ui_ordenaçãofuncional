@@ -1,7 +1,7 @@
 import datetime
 from PyQt6.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QPushButton, QListWidget, 
-    QHBoxLayout, QLabel, QLineEdit, QTextEdit, QComboBox, QDateEdit, QMessageBox
+    QApplication, QWidget, QVBoxLayout, QPushButton, QListWidget,
+    QHBoxLayout, QLineEdit, QTextEdit, QComboBox, QDateEdit, QMessageBox
 )
 from storage import carregar_tarefas, guardar_tarefas
 from models import Tarefa
@@ -10,7 +10,7 @@ from PyQt6.QtCore import Qt, QDate
 
 # Interface gráfica
 class GestorTarefas(QWidget):
-    
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Gestor de Tarefas")
@@ -43,7 +43,7 @@ class GestorTarefas(QWidget):
         # Campo de prazo
         self.campo_prazo = QDateEdit()
         self.campo_prazo.setDisplayFormat("dd/MM/yyyy")
-        self.campo_prazo.setDate(QDate.currentDate())  # Definir a data de hoje
+        self.campo_prazo.setDate(QDate.currentDate())
         self.layout.addWidget(self.campo_prazo)
 
         # Botão Adicionar
@@ -64,7 +64,7 @@ class GestorTarefas(QWidget):
         self.btn_editar = QPushButton("Editar Tarefa")
         self.btn_editar.clicked.connect(self.editar_tarefa)
         botoes_layout.addWidget(self.btn_editar)
-        
+
         self.layout.addLayout(botoes_layout)
 
         # Botões de ordenação
@@ -76,7 +76,7 @@ class GestorTarefas(QWidget):
         self.btn_ordenar_data = QPushButton("Ordenar por Data")
         self.btn_ordenar_data.clicked.connect(self.ordenar_por_data)
         botoes_ordenacao.addWidget(self.btn_ordenar_data)
-        
+
         self.layout.addLayout(botoes_ordenacao)
 
         self.setLayout(self.layout)
@@ -84,14 +84,10 @@ class GestorTarefas(QWidget):
         self.atualizar_lista()
 
     def atualizar_lista(self, filtro=None):
-        # Limpar lista antes de adicionar itens
         self.lista_tarefas.clear()
-        
         tarefas_filtradas = self.tarefas
         if filtro:
-            tarefas_filtradas = [tarefa for tarefa in self.tarefas if filtro.lower() in tarefa.titulo.lower()]
-
-        # Atualizando a lista com as tarefas
+            tarefas_filtradas = [t for t in self.tarefas if filtro.lower() in t.titulo.lower()]
         for tarefa in tarefas_filtradas:
             status = "[✔]" if tarefa.concluida else "[ ]"
             prazo = tarefa.prazo if tarefa.prazo else "Sem prazo"
@@ -107,7 +103,6 @@ class GestorTarefas(QWidget):
         prioridade = self.campo_prioridade.currentText()
         prazo = self.campo_prazo.date().toString("yyyy-MM-dd") if self.campo_prazo.date().isValid() else None
 
-        # Verificação de data
         if prazo and QDate.currentDate() > self.campo_prazo.date():
             QMessageBox.warning(self, "Erro", "A data de prazo não pode ser anterior à data atual.")
             return
@@ -120,16 +115,13 @@ class GestorTarefas(QWidget):
         self.tarefas.append(nova_tarefa)
         guardar_tarefas(self.tarefas)
         self.atualizar_lista()
-
-        # Correção aqui: chamar o método notificar_tarefa corretamente
-        self.notificar_tarefa(nova_tarefa)  # Alterado para chamar a função como método de instância
+        self.notificar_tarefa(nova_tarefa)
 
         self.campo_titulo.clear()
         self.campo_descricao.clear()
         self.campo_prazo.clear()
 
     def notificar_tarefa(self, tarefa):
-        # Aqui você pode definir como deseja notificar sobre a tarefa
         print(f"Notificando tarefa: {tarefa.titulo}")
 
     def remover_tarefa(self):
@@ -153,11 +145,21 @@ class GestorTarefas(QWidget):
             self.campo_titulo.setText(tarefa.titulo)
             self.campo_descricao.setText(tarefa.descricao)
             self.campo_prioridade.setCurrentText(tarefa.prioridade)
-            self.campo_prazo.setDate(datetime.datetime.strptime(tarefa.prazo, "%Y-%m-%d") if tarefa.prazo else QDateEdit().date())
 
-            # Verificar se o botão de salvar já existe, e removê-lo antes de adicionar um novo
+            if tarefa.prazo:
+                data = datetime.datetime.strptime(tarefa.prazo, "%Y-%m-%d")
+                self.campo_prazo.setDate(QDate(data.year, data.month, data.day))
+            else:
+                self.campo_prazo.setDate(QDate.currentDate())
+
+            # Remover botão antigo, se existir
             if hasattr(self, 'btn_salvar_edicao'):
-                self.btn_salvar_edicao.deleteLater()  # Remove o botão antigo
+                self.btn_salvar_edicao.setParent(None)
+                self.btn_salvar_edicao.deleteLater()
+
+            # Criar botão de salvar edição
+            self.btn_salvar_edicao = QPushButton("Salvar Edição")
+            self.layout.addWidget(self.btn_salvar_edicao)
 
             def salvar_edicao():
                 tarefa.titulo = self.campo_titulo.text()
@@ -167,24 +169,20 @@ class GestorTarefas(QWidget):
                 guardar_tarefas(self.tarefas)
                 self.atualizar_lista()
                 QMessageBox.information(self, "Sucesso", "Tarefa editada com sucesso!")
+                self.btn_salvar_edicao.hide()  # Esconde o botão depois de salvar
 
-            self.btn_salvar_edicao = QPushButton("Salvar Edição")
-            self.layout.addWidget(self.btn_salvar_edicao)
             self.btn_salvar_edicao.clicked.connect(salvar_edicao)
 
     def ordenar_por_prioridade(self):
-        # Mapeamento de prioridades para valores numéricos
-        prioridade_map = {"Alta": 3, "Média": 2, "Baixa": 1}
-        
-        # Ordenar tarefas pela prioridade (ordem decrescente)
-        self.tarefas.sort(key=lambda t: prioridade_map.get(t.prioridade, 0), reverse=True)
-        
-        # Atualizar a lista
+        prioridades = {"Alta": 0, "Média": 1, "Baixa": 2}
+        self.tarefas.sort(key=lambda t: prioridades.get(t.prioridade, 3))
         self.atualizar_lista()
 
     def ordenar_por_data(self):
-        # Ordenar tarefas pela data (prazo), considerando tarefas sem prazo
-        self.tarefas.sort(key=lambda t: (t.prazo if t.prazo else "9999-12-31"))
-        
-        # Atualizar a lista
+        def converter_data(tarefa):
+            try:
+                return datetime.datetime.strptime(tarefa.prazo, "%Y-%m-%d") if tarefa.prazo else datetime.datetime.max
+            except Exception:
+                return datetime.datetime.max
+        self.tarefas.sort(key=converter_data)
         self.atualizar_lista()
