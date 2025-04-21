@@ -48,7 +48,5 @@ def from_dict(data):
         data["id"], data["titulo"], data["descricao"],
         data["prioridade"], data.get("prazo"), data["concluida"]
     )
-    # Atribuição de utilizador será feita após o carregamento das listas
-    # apenas o nome, para ligar depois
     tarefa.utilizador_nome = data.get("utilizador")
     return tarefa

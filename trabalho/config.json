@@ -6,7 +6,7 @@
         "prioridade": "Alta",
         "prazo": "2025-04-30",
         "concluida": false,
-        "utilizador": null
+        "utilizador": "Gon\u00e7alo"
     },
     {
         "id": 2,
@@ -15,7 +15,7 @@
         "prioridade": "M\u00e9dia",
         "prazo": "2025-04-23",
         "concluida": false,
-        "utilizador": null
+        "utilizador": "Gon\u00e7alo"
     },
     {
         "id": 3,
@@ -24,7 +24,7 @@
         "prioridade": "Baixa",
         "prazo": "2025-04-12",
         "concluida": false,
-        "utilizador": null
+        "utilizador": "Daniel"
     },
     {
         "id": 4,
@@ -32,15 +32,6 @@
         "descricao": "Mussum Ipsum, cacilds vidis litro abertis.  Quem manda na minha terra sou euzis! T\u00e1 deprimidis, eu conhe\u00e7o uma cachacis que pode alegrar sua vidis. Atirei o pau no gatis, per gatis num morreus. Em p\u00e9 sem cair, deitado sem dormir, sentado sem cochilar e fazendo pose.",
         "prioridade": "Alta",
         "prazo": "2025-05-01",
-        "concluida": false,
-        "utilizador": null
-    },
-    {
-        "id": 5,
-        "titulo": "a",
-        "descricao": "a",
-        "prioridade": "Alta",
-        "prazo": "2025-04-08",
         "concluida": false,
         "utilizador": "Paulo"
     }
