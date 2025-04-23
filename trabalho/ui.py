@@ -16,62 +16,76 @@ class GestorTarefas(QWidget):
 
     def __init__(self):
         super().__init__()
+
         self.utilizadores = carregar_utilizadores()
         self.tarefas = carregar_tarefas(self.utilizadores)
-        self.setWindowTitle("Gestor de Tarefas")
-        self.setGeometry(400, 200, 700, 400)
-        self.layout = QVBoxLayout()
+        self.setWindowTitle("FocusFlow")
+        self.setStyleSheet(open("styles/style.qss", "r").read())
+        self.setGeometry(400, 200, 800, 500)
 
-        # Campo de Pesquisa
-        self.campo_pesquisa = QLineEdit()
-        self.campo_pesquisa.setPlaceholderText("Pesquisar Tarefa")
-        self.campo_pesquisa.textChanged.connect(self.pesquisar_tarefa)
-        self.layout.addWidget(self.campo_pesquisa)
+        # Layout principal (duas colunas)
+        layout_principal = QHBoxLayout()
 
-        # Lista de Tarefas
-        self.lista_tarefas = QListWidget()
-        self.layout.addWidget(self.lista_tarefas)
+        """====================================="""
+        # Coluna 1: Formulário para criar tarefas
+        """====================================="""
+        coluna_criar_tarefa = QVBoxLayout()
 
-        # Formulário
+        # Campo de título
         self.campo_titulo = QLineEdit()
         self.campo_titulo.setPlaceholderText("Título da Tarefa")
-        self.layout.addWidget(self.campo_titulo)
+        coluna_criar_tarefa.addWidget(self.campo_titulo)
 
+        # Campo de descrição
         self.campo_descricao = QTextEdit()
         self.campo_descricao.setPlaceholderText("Descrição")
-        self.layout.addWidget(self.campo_descricao)
+        coluna_criar_tarefa.addWidget(self.campo_descricao)
 
-        # self.campo_prioridade = QComboBox()
-        # self.campo_prioridade.addItems(["Alta", "Média", "Baixa"])
-        # self.layout.addWidget(self.campo_prioridade)
-
-        # Botões de prioridade e utilizador
-        botoes_prioridade_ordenação = QHBoxLayout()
+        # Campo de prioridade
         self.campo_prioridade = QComboBox()
         self.campo_prioridade.addItems(["Alta", "Média", "Baixa"])
-        botoes_prioridade_ordenação.addWidget(self.campo_prioridade)
+        coluna_criar_tarefa.addWidget(self.campo_prioridade)
 
+        # Campo de utilizador
         self.campo_utilizador = QComboBox()
-        botoes_prioridade_ordenação.addWidget(self.campo_utilizador)
+        coluna_criar_tarefa.addWidget(self.campo_utilizador)
 
+        # Botão para criar utilizador
         self.btn_criar_utilizador = QPushButton("Criar Utilizador")
         self.btn_criar_utilizador.clicked.connect(self.criar_utilizador)
-        botoes_prioridade_ordenação.addWidget(self.btn_criar_utilizador)
-
-        self.atualizar_utilizadores()
-
-        self.layout.addLayout(botoes_prioridade_ordenação)
+        coluna_criar_tarefa.addWidget(self.btn_criar_utilizador)
 
         # Campo de prazo
         self.campo_prazo = QDateEdit()
         self.campo_prazo.setDisplayFormat("dd/MM/yyyy")
         self.campo_prazo.setDate(QDate.currentDate())
-        self.layout.addWidget(self.campo_prazo)
+        coluna_criar_tarefa.addWidget(self.campo_prazo)
 
-        # Botão Adicionar
+        # Botão para adicionar tarefa
         self.btn_adicionar = QPushButton("Adicionar Tarefa")
         self.btn_adicionar.clicked.connect(self.adicionar_tarefa)
-        self.layout.addWidget(self.btn_adicionar)
+        coluna_criar_tarefa.addWidget(self.btn_adicionar)
+
+        """====================================="""
+        # Adicionar a coluna de criação ao layout principal
+        """====================================="""
+        layout_principal.addLayout(coluna_criar_tarefa)
+        """====================================="""
+
+        """====================================="""
+        # Coluna 2: Lista de tarefas e pesquisa
+        """====================================="""
+        coluna_lista_tarefas = QVBoxLayout()
+
+        # Campo de pesquisa
+        self.campo_pesquisa = QLineEdit()
+        self.campo_pesquisa.setPlaceholderText("Pesquisar Tarefa")
+        self.campo_pesquisa.textChanged.connect(self.pesquisar_tarefa)
+        coluna_lista_tarefas.addWidget(self.campo_pesquisa)
+
+        # Lista de tarefas
+        self.lista_tarefas = QListWidget()
+        coluna_lista_tarefas.addWidget(self.lista_tarefas)
 
         # Botões de ações
         botoes_layout = QHBoxLayout()
@@ -87,7 +101,7 @@ class GestorTarefas(QWidget):
         self.btn_editar.clicked.connect(self.editar_tarefa)
         botoes_layout.addWidget(self.btn_editar)
 
-        self.layout.addLayout(botoes_layout)
+        coluna_lista_tarefas.addLayout(botoes_layout)
 
         # Botões de ordenação
         botoes_ordenacao = QHBoxLayout()
@@ -100,10 +114,19 @@ class GestorTarefas(QWidget):
         self.btn_ordenar_data.clicked.connect(self.ordenar_por_data)
         botoes_ordenacao.addWidget(self.btn_ordenar_data)
 
-        self.layout.addLayout(botoes_ordenacao)
+        coluna_lista_tarefas.addLayout(botoes_ordenacao)
 
-        self.setLayout(self.layout)
-        self.tarefas = carregar_tarefas()
+        """====================================="""
+        # Adicionar a coluna de lista ao layout principal
+        """====================================="""
+        layout_principal.addLayout(coluna_lista_tarefas)
+        """====================================="""
+
+        # layout principal
+        self.setLayout(layout_principal)
+
+        # Inicializar a lista de utilizadores e tarefas
+        self.atualizar_utilizadores()
         self.atualizar_lista()
 
     def atualizar_lista(self, filtro=None):
@@ -113,7 +136,7 @@ class GestorTarefas(QWidget):
             tarefas_filtradas = [
                 t for t in self.tarefas if filtro.lower() in t.titulo.lower()]
         for tarefa in tarefas_filtradas:
-            status = "[✔]" if tarefa.concluida else "[ ]"
+            status = "[🟢]" if tarefa.concluida else "[🔴]"
             prazo = tarefa.prazo if tarefa.prazo else "Sem prazo"
             self.lista_tarefas.addItem(
                 f"{status} {tarefa.titulo} - {tarefa.prioridade} - {prazo}")
