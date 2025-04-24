@@ -1,26 +1,17 @@
 [
     {
         "id": 1,
-        "titulo": "Teste 1",
-        "descricao": "Mussum Ipsum, cacilds vidis litro abertis.  Casamentiss faiz malandris se pirulit\u00e1. Bota 1 metro de cachacis a\u00ed pra viagem! Admodum accumsan disputationi eu sit. Vide electram sadipscing et per. Delegadis gente finis, bibendum egestas augue arcu ut est.",
+        "titulo": "Reuni\u00e3o de Planeamento de Sprint",
+        "descricao": "Organizar e liderar a reuni\u00e3o de planeamento para definir os objetivos e tarefas da pr\u00f3xima sprint.",
         "prioridade": "Alta",
         "prazo": "2025-04-30",
         "concluida": false,
         "utilizador": "Gon\u00e7alo"
     },
     {
-        "id": 4,
-        "titulo": "Teste 4",
-        "descricao": "Mussum Ipsum, cacilds vidis litro abertis.  Quem manda na minha terra sou euzis! T\u00e1 deprimidis, eu conhe\u00e7o uma cachacis que pode alegrar sua vidis. Atirei o pau no gatis, per gatis num morreus. Em p\u00e9 sem cair, deitado sem dormir, sentado sem cochilar e fazendo pose.",
-        "prioridade": "Alta",
-        "prazo": "2025-05-01",
-        "concluida": false,
-        "utilizador": "Paulo"
-    },
-    {
         "id": 2,
-        "titulo": "Teste 2",
-        "descricao": "Mussum Ipsum, cacilds vidis litro abertis.  T\u00e1 deprimidis, eu conhe\u00e7o uma cachacis que pode alegrar sua vidis. Praesent vel viverra nisi. Mauris aliquet nunc non turpis scelerisque, eget. Morbi viverra placerat justo, vel pharetra turpis. Pra l\u00e1, depois divoltis porris, paradis.",
+        "titulo": "Revis\u00e3o de Interface Mobile",
+        "descricao": "Avaliar e propor melhorias na interface da aplica\u00e7\u00e3o m\u00f3vel com foco em usabilidade.",
         "prioridade": "M\u00e9dia",
         "prazo": "2025-04-23",
         "concluida": false,
@@ -28,10 +19,73 @@
     },
     {
         "id": 3,
-        "titulo": "Teste 3",
-        "descricao": "Mussum Ipsum, cacilds vidis litro abertis.  Paisis, filhis, espiritis santis. Casamentiss faiz malandris se pirulit\u00e1. Pra l\u00e1, depois divoltis porris, paradis. Praesent malesuada urna nisi, quis volutpat erat hendrerit non. Nam vulputate dapibus.",
+        "titulo": "Criar Prot\u00f3tipo do Dashboard",
+        "descricao": "Desenvolver o prot\u00f3tipo visual do novo painel de controlo para o utilizador final.",
         "prioridade": "Baixa",
         "prazo": "2025-04-12",
+        "concluida": false,
+        "utilizador": "Daniel"
+    },
+    {
+        "id": 4,
+        "titulo": "Configura\u00e7\u00e3o do Ambiente de Produ\u00e7\u00e3o",
+        "descricao": "Finalizar as configura\u00e7\u00f5es necess\u00e1rias para o ambiente de produ\u00e7\u00e3o antes da entrega da sprint.",
+        "prioridade": "Alta",
+        "prazo": "2025-05-01",
+        "concluida": false,
+        "utilizador": "Paulo"
+    },
+    {
+        "id": 5,
+        "titulo": "Corrigir bugs cr\u00edticos",
+        "descricao": "Analisar o relat\u00f3rio de erros e corrigir bugs que bloqueiam a entrega da pr\u00f3xima sprint.",
+        "prioridade": "Alta",
+        "prazo": "2025-05-02",
+        "concluida": false,
+        "utilizador": "Paulo"
+    },
+    {
+        "id": 6,
+        "titulo": "Desenhar wireframes",
+        "descricao": "Criar wireframes para as novas funcionalidades da interface.",
+        "prioridade": "M\u00e9dia",
+        "prazo": "2025-05-05",
+        "concluida": false,
+        "utilizador": "Daniel"
+    },
+    {
+        "id": 7,
+        "titulo": "Preparar apresenta\u00e7\u00e3o para o cliente",
+        "descricao": "Montar os slides e preparar um gui\u00e3o para a reuni\u00e3o de entrega do MVP.",
+        "prioridade": "Alta",
+        "prazo": "2025-05-03",
+        "concluida": false,
+        "utilizador": "Gon\u00e7alo"
+    },
+    {
+        "id": 8,
+        "titulo": "Escrever testes automatizados",
+        "descricao": "Cobrir as novas funcionalidades com testes unit\u00e1rios e de integra\u00e7\u00e3o.",
+        "prioridade": "M\u00e9dia",
+        "prazo": "2025-05-07",
+        "concluida": false,
+        "utilizador": "Paulo"
+    },
+    {
+        "id": 9,
+        "titulo": "Rever c\u00f3digo em pull requests",
+        "descricao": "Avaliar o c\u00f3digo submetido por colegas e garantir que cumpre os padr\u00f5es definidos.",
+        "prioridade": "Baixa",
+        "prazo": "2025-05-10",
+        "concluida": false,
+        "utilizador": "Gon\u00e7alo"
+    },
+    {
+        "id": 10,
+        "titulo": "Documentar funcionalidades",
+        "descricao": "Atualizar a documenta\u00e7\u00e3o t\u00e9cnica com as funcionalidades da \u00faltima vers\u00e3o.",
+        "prioridade": "M\u00e9dia",
+        "prazo": "2025-05-04",
         "concluida": false,
         "utilizador": "Daniel"
     }

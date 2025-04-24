@@ -10,7 +10,7 @@ class LoginUI(QWidget):
 
         self.setWindowTitle("FocusFlow")
         self.setStyleSheet(open("styles/style.qss", "r").read())
-        self.setGeometry(400, 200, 400, 200)
+        self.setGeometry(400, 200, 800, 500)
         layout = QVBoxLayout()
 
         self.campo_email = QLineEdit()
