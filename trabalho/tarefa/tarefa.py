@@ -22,13 +22,13 @@ class Tarefa:
     @classmethod
     def from_dict(cls, data):
         return cls(
-            data["id"],
-            data["titulo"],
-            data["descricao"],
-            data["prioridade"],
-            data.get("prazo"),
-            data.get("concluida", False),
-            None  # O utilizador será atribuído depois
+            id=data["id"],
+            titulo=data["titulo"],
+            descricao=data["descricao"],
+            prioridade=data["prioridade"],
+            prazo=data.get("prazo"),
+            concluida=data.get("concluida", False),
+            utilizador=None
         )
 
     def __str__(self):

@@ -20,7 +20,6 @@ def carregar_tarefas(utilizadores=None):
                     (u for u in utilizadores if u.nome == user_nome), None)
                 if user:
                     tarefa.utilizador = user
-                    user.adicionar_tarefa(tarefa)
             tarefas.append(tarefa)
         return tarefas
 
