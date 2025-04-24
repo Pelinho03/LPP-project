@@ -1,0 +1,17 @@
+[
+    {
+        "nome": "Paulo",
+        "email": "paulo@email.pt",
+        "grupo": "admin"
+    },
+    {
+        "nome": "Daniel",
+        "email": "daniel@email.pt",
+        "grupo": "designer"
+    },
+    {
+        "nome": "Gon\u00e7alo",
+        "email": "goncalo@email.pt",
+        "grupo": "developer"
+    }
+]
