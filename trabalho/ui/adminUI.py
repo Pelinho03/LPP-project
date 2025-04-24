@@ -1,14 +1,13 @@
 import datetime
-from PyQt6.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QPushButton, QListWidget,
-    QHBoxLayout, QLineEdit, QTextEdit, QComboBox, QDateEdit, QMessageBox, QInputDialog
-)
-from PyQt6.QtCore import Qt, QDate
-from storage import carregar_tarefas, guardar_tarefas
-from storage_users import carregar_utilizadores, guardar_utilizadores
-from models import Tarefa
-from users import User
-from notifications import notificar_tarefa
+from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QPushButton, QListWidget,
+                             QHBoxLayout, QLineEdit, QTextEdit, QComboBox, QDateEdit, QMessageBox, QInputDialog
+                             )
+from PyQt6.QtCore import QDate
+from tarefa.tarefa_json import carregar_tarefas, guardar_tarefas
+from tarefa.tarefa import Tarefa
+from user.user_json import carregar_utilizadores, guardar_utilizadores
+from user.user import User
+from notificações.notifications import notificar_tarefa
 
 
 # Interface gráfica
@@ -85,7 +84,14 @@ class GestorTarefas(QWidget):
 
         # Lista de tarefas
         self.lista_tarefas = QListWidget()
+        self.lista_tarefas.itemClicked.connect(
+            self.exibir_detalhes_tarefa)  # Conectar clique ao método
         coluna_lista_tarefas.addWidget(self.lista_tarefas)
+
+        # Visor de detalhes da tarefa
+        self.visor_detalhes = QTextEdit()
+        self.visor_detalhes.setReadOnly(True)  # Apenas leitura
+        coluna_lista_tarefas.addWidget(self.visor_detalhes)
 
         # Botões de ações
         botoes_layout = QHBoxLayout()
@@ -128,6 +134,21 @@ class GestorTarefas(QWidget):
         # Inicializar a lista de utilizadores e tarefas
         self.atualizar_utilizadores()
         self.atualizar_lista()
+
+    def exibir_detalhes_tarefa(self, item):
+        index = self.lista_tarefas.row(item)
+        tarefa = self.tarefas[index]
+        detalhes = (
+            f"Título: {tarefa.titulo}\n"
+            f"-----------------------------------------------------------\n"
+            f"Descrição: {tarefa.descricao}\n"
+            f"-----------------------------------------------------------\n"
+            f"Prioridade: {tarefa.prioridade}\n"
+            f"Prazo: {tarefa.prazo if tarefa.prazo else 'Sem prazo'}\n"
+            f"Concluída: {'Sim' if tarefa.concluida else 'Não'}\n"
+            f"Utilizador: {tarefa.utilizador.nome if tarefa.utilizador else 'Nenhum'}\n"
+        )
+        self.visor_detalhes.setText(detalhes)
 
     def atualizar_lista(self, filtro=None):
         self.lista_tarefas.clear()
@@ -274,7 +295,14 @@ class GestorTarefas(QWidget):
                 self, "Erro", "O email do Utilizador não pode estar vazio.")
             return
 
-        novo_user = User(nome.strip(), email.strip())
+        grupo, ok_grupo = QInputDialog.getItem(
+            self, "Grupo do Utilizador", "Selecione o grupo:",
+            ["admin", "desenvolvedores", "design"], 0, False
+        )
+        if not ok_grupo:
+            return
+
+        novo_user = User(nome.strip(), email.strip(), grupo)
         self.utilizadores.append(novo_user)
         guardar_utilizadores(self.utilizadores)
         self.atualizar_utilizadores()

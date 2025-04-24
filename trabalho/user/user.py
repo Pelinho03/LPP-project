@@ -1,7 +1,8 @@
 class User:
-    def __init__(self, nome, email):
+    def __init__(self, nome, email, grupo="user"):
         self.nome = nome
         self.email = email
+        self.grupo = grupo
         self.tarefas = []
 
     def adicionar_tarefa(self, tarefa):
@@ -23,9 +24,10 @@ class User:
     def to_dict(self):
         return {
             "nome": self.nome,
-            "email": self.email
+            "email": self.email,
+            "grupo": self.grupo
         }
 
     @classmethod
     def from_dict(cls, data):
-        return cls(data["nome"], data["email"])
+        return cls(data["nome"], data["email"], data.get("grupo", "user"))

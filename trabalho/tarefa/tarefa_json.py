@@ -1,8 +1,8 @@
 import json
 import os
-from models import Tarefa
+from tarefa.tarefa import Tarefa
 
-FILENAME = "config.json"
+FILENAME = "json/tarefas.json"
 
 
 def carregar_tarefas(utilizadores=None):
