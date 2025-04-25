@@ -2,6 +2,7 @@ import datetime
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QPushButton, QListWidget,
                              QHBoxLayout, QLineEdit, QTextEdit, QComboBox, QDateEdit, QMessageBox, QInputDialog
                              )
+from PyQt6.QtCore import Qt
 from PyQt6.QtCore import QDate
 from tarefa.tarefa_json import carregar_tarefas, guardar_tarefas
 from tarefa.tarefa import Tarefa
@@ -10,9 +11,7 @@ from user.user import User
 from notificações.notifications import notificar_tarefa
 
 
-# Interface gráfica
 class GestorTarefas(QWidget):
-
     def __init__(self):
         super().__init__()
 
@@ -22,12 +21,36 @@ class GestorTarefas(QWidget):
         self.setStyleSheet(open("styles/style.qss", "r").read())
         self.setGeometry(400, 200, 800, 500)
 
-        # Layout principal (duas colunas)
-        layout_principal = QHBoxLayout()
+        # Layout geral (vertical)
+        layout_geral = QVBoxLayout()
 
         """====================================="""
-        # Coluna 1: Formulário para criar tarefas
+        # Navbar (linha superior com botões)
         """====================================="""
+        layout_navbar = QHBoxLayout()
+
+        # Botão "Voltar"
+        self.botao_retroceder = QPushButton("Voltar")
+        self.botao_retroceder.setFixedWidth(100)
+        layout_navbar.addWidget(self.botao_retroceder)
+
+        # Botão "Teste"
+        self.botao_teste = QPushButton("Teste")
+        self.botao_teste.setFixedWidth(100)
+        layout_navbar.addWidget(self.botao_teste)
+
+        # Centralizar os botões no navbar
+        layout_navbar.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+
+        # Adicionar o navbar ao layout geral
+        layout_geral.addLayout(layout_navbar)
+
+        """====================================="""
+        # Layout principal (duas colunas)
+        """====================================="""
+        layout_principal = QHBoxLayout()
+
+        # Coluna 1: Formulário para criar tarefas
         coluna_criar_tarefa = QVBoxLayout()
 
         # Campo de título
@@ -46,13 +69,16 @@ class GestorTarefas(QWidget):
         coluna_criar_tarefa.addWidget(self.campo_prioridade)
 
         # Campo de utilizador
+        campos_utilizador = QHBoxLayout()
         self.campo_utilizador = QComboBox()
-        coluna_criar_tarefa.addWidget(self.campo_utilizador)
+        campos_utilizador.addWidget(self.campo_utilizador)
 
         # Botão para criar utilizador
         self.btn_criar_utilizador = QPushButton("Criar Utilizador")
         self.btn_criar_utilizador.clicked.connect(self.criar_utilizador)
-        coluna_criar_tarefa.addWidget(self.btn_criar_utilizador)
+        campos_utilizador.addWidget(self.btn_criar_utilizador)
+
+        coluna_criar_tarefa.addLayout(campos_utilizador)
 
         # Campo de prazo
         self.campo_prazo = QDateEdit()
@@ -65,15 +91,10 @@ class GestorTarefas(QWidget):
         self.btn_adicionar.clicked.connect(self.adicionar_tarefa)
         coluna_criar_tarefa.addWidget(self.btn_adicionar)
 
-        """====================================="""
         # Adicionar a coluna de criação ao layout principal
-        """====================================="""
         layout_principal.addLayout(coluna_criar_tarefa)
-        """====================================="""
 
-        """====================================="""
         # Coluna 2: Lista de tarefas e pesquisa
-        """====================================="""
         coluna_lista_tarefas = QVBoxLayout()
 
         # Campo de pesquisa
@@ -84,13 +105,12 @@ class GestorTarefas(QWidget):
 
         # Lista de tarefas
         self.lista_tarefas = QListWidget()
-        self.lista_tarefas.itemClicked.connect(
-            self.exibir_detalhes_tarefa)  # Conectar clique ao método
+        self.lista_tarefas.itemClicked.connect(self.exibir_detalhes_tarefa)
         coluna_lista_tarefas.addWidget(self.lista_tarefas)
 
         # Visor de detalhes da tarefa
         self.visor_detalhes = QTextEdit()
-        self.visor_detalhes.setReadOnly(True)  # Apenas leitura
+        self.visor_detalhes.setReadOnly(True)
         coluna_lista_tarefas.addWidget(self.visor_detalhes)
 
         # Botões de ações
@@ -122,14 +142,14 @@ class GestorTarefas(QWidget):
 
         coluna_lista_tarefas.addLayout(botoes_ordenacao)
 
-        """====================================="""
         # Adicionar a coluna de lista ao layout principal
-        """====================================="""
         layout_principal.addLayout(coluna_lista_tarefas)
-        """====================================="""
 
-        # layout principal
-        self.setLayout(layout_principal)
+        # Adicionar o layout principal ao layout geral
+        layout_geral.addLayout(layout_principal)
+
+        # Configurar o layout geral
+        self.setLayout(layout_geral)
 
         # Inicializar a lista de utilizadores e tarefas
         self.atualizar_utilizadores()
