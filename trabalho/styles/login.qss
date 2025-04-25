@@ -1,61 +1,48 @@
-/* Estilo geral */
+/* Estilo geral para o QWidget */
 QWidget {
     background-color: #2E3440;
     color: #ECEFF4;
     font-family: "Segoe UI", Arial, sans-serif;
     font-size: 14px;
-    border: none;
 }
 
-/* Componentes de entrada (botões, dropdowns, campos de texto simples) */
-QPushButton,
-QComboBox,
+/* Estilo para o QLineEdit (campo de entrada) */
 QLineEdit {
     background-color: #3B4252;
     border: 1px solid #4C566A;
     border-radius: 6px;
-    color: #ECEFF4;
     padding: 8px;
+    color: #ECEFF4;
 }
 
-/* Comportamento ao passar o rato sobre botões */
-QPushButton:hover {
-    background-color: #81A1C1;
-    border: 1px solid #81A1C1;
-}
-
-/* Comportamento ao clicar em botões */
-QPushButton:pressed {
-    background-color: #4C566A;
-}
-
-/* QLineEdit em foco */
 QLineEdit:focus {
     border: 1px solid #88C0D0;
 }
 
-/* QCheckBox */
-QCheckBox {
-    color: #ECEFF4;
-}
-
-/* QTextEdit */
-QTextEdit {
-    background-color: #3B4252;
-    border: 1px solid #4C566A;
+/* Estilo para o QPushButton (botão) */
+QPushButton {
+    background-color: #5E81AC;
+    border: none;
     border-radius: 6px;
+    padding: 10px 15px;
     color: #ECEFF4;
-    padding: 8px;
-    font-size: 14px;
-    font-family: "Segoe UI", Arial, sans-serif;
+    font-weight: bold;
 }
 
-/* QMessageBox */
+QPushButton:hover {
+    background-color: #81A1C1; 
+}
+
+QPushButton:pressed {
+    background-color: #4C566A;
+}
+
+/* Estilo para o QMessageBox */
 QMessageBox {
     background-color: #3B4252;
     color: #ECEFF4;
     border: 1px solid #4C566A;
-    border-radius: 6px;
+    border-radius: 6px;*/
 }
 
 QMessageBox QLabel {

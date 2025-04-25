@@ -7,18 +7,18 @@ from ui.userUI import UserUI
 from user.user import User  # para efeitos de teste
 
 # TESTAR ADMIN UI
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)
-#     gestor = GestorTarefas()
-#     gestor.show()
-#     sys.exit(app.exec())
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    gestor = GestorTarefas()
+    gestor.show()
+    sys.exit(app.exec())
 
 # LOGIN UI (MAIN UI)
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)
-#     login = LoginUI()
-#     login.show()
-#     sys.exit(app.exec())
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    login = LoginUI()
+    login.show()
+    sys.exit(app.exec())
 
 # TESTAR USER UI
 if __name__ == "__main__":
