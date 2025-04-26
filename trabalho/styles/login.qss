@@ -1,68 +1,68 @@
 /* Estilo geral para o QWidget */
 QWidget {
-    background-color: #2E3440;
-    color: #ECEFF4;
+    background-color: #0f172a; /* Fundo principal */
+    color: #e2e8f0; /* Cor de texto */
     font-family: "Segoe UI", Arial, sans-serif;
     font-size: 14px;
 }
 
 /* Estilo para o QLineEdit (campo de entrada) */
 QLineEdit {
-    background-color: #3B4252;
-    border: 1px solid #4C566A;
+    background-color: #0a0f1c; /* Fundo secundário */
+    border: 1px solid #4f46e5; /* Cor primária para borda */
     border-radius: 6px;
     padding: 8px;
-    color: #ECEFF4;
+    color: #e2e8f0;
 }
 
 QLineEdit:focus {
-    border: 1px solid #88C0D0;
+    border: 1px solid #7c3aed; /* Cor secundária em foco */
 }
 
 /* Estilo para o QPushButton (botão) */
 QPushButton {
-    background-color: #5E81AC;
+    background-color: #4f46e5; /* Cor primária */
     border: none;
     border-radius: 6px;
     padding: 10px 15px;
-    color: #ECEFF4;
+    color: #e2e8f0;
     font-weight: bold;
 }
 
 QPushButton:hover {
-    background-color: #81A1C1; 
+    background-color: #7c3aed; /* Cor secundária ao passar o rato */
 }
 
 QPushButton:pressed {
-    background-color: #4C566A;
+    background-color: #372d91; /* Tom mais escuro para clique */
 }
 
 /* Estilo para o QMessageBox */
 QMessageBox {
-    background-color: #3B4252;
-    color: #ECEFF4;
-    border: 1px solid #4C566A;
-    border-radius: 6px;*/
+    background-color: #0a0f1c; /* Fundo secundário */
+    color: #e2e8f0;
+    border: 1px solid #4f46e5;
+    border-radius: 6px;
 }
 
 QMessageBox QLabel {
-    color: #ECEFF4;
+    color: #e2e8f0;
     font-size: 14px;
 }
 
 QMessageBox QPushButton {
-    background-color: #5E81AC;
+    background-color: #4f46e5;
     border: none;
     border-radius: 6px;
     padding: 8px 12px;
-    color: #ECEFF4;
+    color: #e2e8f0;
     font-weight: bold;
 }
 
 QMessageBox QPushButton:hover {
-    background-color: #81A1C1;
+    background-color: #7c3aed;
 }
 
 QMessageBox QPushButton:pressed {
-    background-color: #4C566A;
+    background-color: #372d91;
 }

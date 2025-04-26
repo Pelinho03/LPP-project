@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QLabel, QPushButton, QMessageBox, QLineEdit, QVBoxLayout, QHBoxLayout
+from PyQt6.QtWidgets import QWidget, QLabel, QPushButton, QMessageBox, QLineEdit, QVBoxLayout, QHBoxLayout, QSpacerItem, QSizePolicy
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap
 from ui.adminUI import GestorTarefas
@@ -12,43 +12,30 @@ class LoginUI(QWidget):
 
         self.setWindowTitle("FocusFlow | Login")
         self.setStyleSheet(open("styles/login.qss", "r").read())
-        self.setGeometry(400, 200, 800, 500)
+        self.setGeometry(300, 50, 1000, 700)
+
         layout = QVBoxLayout()
-        # Define o espaçamento vertical entre os widgets (10px)
-        layout.setSpacing(10)
+
+        # Espaçador para empurrar tudo mais para o centro
+        layout.addSpacerItem(QSpacerItem(
+            20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
 
         # Imagem
         self.image = QLabel()
-        pixmap = QPixmap('assets/app_icon.png')
-        pixmap = pixmap.scaled(200, 200, Qt.AspectRatioMode.KeepAspectRatio,
-                               Qt.TransformationMode.SmoothTransformation)
-        self.image.setPixmap(pixmap)
-        self.image.setFixedSize(200, 200)
+        pixmap = QPixmap('assets/logo_focusflow_complete.png')
+        self.image.setPixmap(pixmap.scaled(
+            250, 250, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
         self.image.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+        layout.addWidget(self.image)
 
-        # Envolver a imagem em um QHBoxLayout para centralizá-la
-        image_container = QHBoxLayout()
-        image_container.addWidget(self.image)
-        image_container.setAlignment(Qt.AlignmentFlag.AlignHCenter)
-        layout.addLayout(image_container)
-
-        # # Título
-        # self.titulo = QLabel("Login")
-        # self.titulo.setStyleSheet("font-weight: bold; font-size: 35px;")
-        # self.titulo.setAlignment(Qt.AlignmentFlag.AlignHCenter)
-
-        # # Envolver o título em um QHBoxLayout para centralizá-lo
-        # titulo_container = QHBoxLayout()
-        # titulo_container.addWidget(self.titulo)
-        # titulo_container.setAlignment(Qt.AlignmentFlag.AlignHCenter)
-        # layout.addLayout(titulo_container)
+        # Pequeno espaçador entre imagem e campos
+        layout.addSpacerItem(QSpacerItem(
+            20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed))
 
         # Campo de email
         self.campo_email = QLineEdit()
         self.campo_email.setPlaceholderText("Email")
         self.campo_email.setFixedWidth(300)
-
-        # Envolver o campo de email em um QHBoxLayout para centralizá-lo
         email_container = QHBoxLayout()
         email_container.addWidget(self.campo_email)
         email_container.setAlignment(Qt.AlignmentFlag.AlignHCenter)
@@ -57,28 +44,28 @@ class LoginUI(QWidget):
         # Botão de login
         self.btn_login = QPushButton("Login")
         self.btn_login.clicked.connect(self.verificar_login)
-        self.btn_login.setFixedWidth(150)
-
-        # Envolver o botão em um QHBoxLayout para centralizá-lo
+        self.btn_login.setFixedWidth(300)
         button_container = QHBoxLayout()
         button_container.addWidget(self.btn_login)
         button_container.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         layout.addLayout(button_container)
 
-        # Configurar o layout principal
+        # Espaçador para preencher o fundo
+        layout.addSpacerItem(QSpacerItem(
+            20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
+
+        # Configurar layout principal
         self.setLayout(layout)
 
     def verificar_login(self):
         email = self.campo_email.text().strip()
         utilizadores = carregar_utilizadores()
 
-        # Verificar se o utilizador existe
         user = next((u for u in utilizadores if u.email == email), None)
         if not user:
             QMessageBox.warning(self, "Erro", "Utilizador não encontrado!")
             return
 
-        # Redirecionar com base no grupo
         if user.grupo == "admin":
             self.abrir_ui_admin()
         else:
