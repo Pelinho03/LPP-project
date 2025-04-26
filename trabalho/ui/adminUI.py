@@ -1,9 +1,10 @@
 import datetime
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QPushButton, QListWidget,
-                             QHBoxLayout, QLineEdit, QTextEdit, QComboBox, QDateEdit, QMessageBox, QInputDialog
+                             QHBoxLayout, QLineEdit, QTextEdit, QComboBox, QDateEdit, QMessageBox, QInputDialog, QLabel
                              )
 from PyQt6.QtCore import Qt
 from PyQt6.QtCore import QDate
+from PyQt6.QtGui import QPixmap
 from tarefa.tarefa_json import carregar_tarefas, guardar_tarefas
 from tarefa.tarefa import Tarefa
 from user.user_json import carregar_utilizadores, guardar_utilizadores
@@ -17,9 +18,9 @@ class GestorTarefas(QWidget):
 
         self.utilizadores = carregar_utilizadores()
         self.tarefas = carregar_tarefas(self.utilizadores)
-        self.setWindowTitle("FocusFlow")
+        self.setWindowTitle("FocusFlow | Admin")
         self.setStyleSheet(open("styles/style.qss", "r").read())
-        self.setGeometry(400, 200, 800, 500)
+        self.setGeometry(300, 50, 1000, 700)
 
         # Layout geral (vertical)
         layout_geral = QVBoxLayout()
@@ -30,17 +31,21 @@ class GestorTarefas(QWidget):
         layout_navbar = QHBoxLayout()
 
         # Botão "Voltar"
-        self.botao_retroceder = QPushButton("Voltar")
-        self.botao_retroceder.setFixedWidth(100)
-        layout_navbar.addWidget(self.botao_retroceder)
+        self.btn_retroceder = QPushButton("Voltar")
+        self.btn_retroceder.setFixedWidth(100)
+        self.btn_retroceder.clicked.connect(self.voltar_login)
+        layout_navbar.addWidget(self.btn_retroceder)
 
-        # Botão "Teste"
-        self.botao_teste = QPushButton("Teste")
-        self.botao_teste.setFixedWidth(100)
-        layout_navbar.addWidget(self.botao_teste)
+        # logo
+        self.logo = QLabel()
+        pixmap = QPixmap('assets/logo_focusflow_lettering.png')
+        self.logo.setPixmap(pixmap.scaled(
+            100, 100, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
+        layout_navbar.addWidget(
+            self.logo, alignment=Qt.AlignmentFlag.AlignHCenter)
 
         # Centralizar os botões no navbar
-        layout_navbar.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+        layout_navbar.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
         # Adicionar o navbar ao layout geral
         layout_geral.addLayout(layout_navbar)
@@ -64,9 +69,18 @@ class GestorTarefas(QWidget):
         coluna_criar_tarefa.addWidget(self.campo_descricao)
 
         # Campo de prioridade
+        campos_extra = QHBoxLayout()
         self.campo_prioridade = QComboBox()
         self.campo_prioridade.addItems(["Alta", "Média", "Baixa"])
-        coluna_criar_tarefa.addWidget(self.campo_prioridade)
+        campos_extra.addWidget(self.campo_prioridade)
+
+        # Campo de prazo
+        self.campo_prazo = QDateEdit()
+        self.campo_prazo.setDisplayFormat("dd/MM/yyyy")
+        self.campo_prazo.setDate(QDate.currentDate())
+        campos_extra.addWidget(self.campo_prazo)
+
+        coluna_criar_tarefa.addLayout(campos_extra)
 
         # Campo de utilizador
         campos_utilizador = QHBoxLayout()
@@ -79,12 +93,6 @@ class GestorTarefas(QWidget):
         campos_utilizador.addWidget(self.btn_criar_utilizador)
 
         coluna_criar_tarefa.addLayout(campos_utilizador)
-
-        # Campo de prazo
-        self.campo_prazo = QDateEdit()
-        self.campo_prazo.setDisplayFormat("dd/MM/yyyy")
-        self.campo_prazo.setDate(QDate.currentDate())
-        coluna_criar_tarefa.addWidget(self.campo_prazo)
 
         # Botão para adicionar tarefa
         self.btn_adicionar = QPushButton("Adicionar Tarefa")
@@ -185,6 +193,12 @@ class GestorTarefas(QWidget):
     def pesquisar_tarefa(self):
         texto_pesquisa = self.campo_pesquisa.text()
         self.atualizar_lista(texto_pesquisa)
+
+    def voltar_login(self):
+        from ui.loginUI import LoginUI
+        self.close()
+        self.login = LoginUI()
+        self.login.show()
 
     def adicionar_tarefa(self):
         titulo = self.campo_titulo.text()

@@ -1,4 +1,6 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QListWidget, QLineEdit, QTextEdit, QHBoxLayout, QPushButton, QMessageBox
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QListWidget, QLineEdit, QTextEdit, QHBoxLayout, QPushButton, QLabel
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QPixmap
 from tarefa.tarefa_json import carregar_tarefas
 from user.user_json import carregar_utilizadores
 
@@ -8,16 +10,45 @@ class UserUI(QWidget):
         super().__init__()
         self.user = user
         self.tarefas_user = []  # Armazena as tarefas associadas ao utilizador
-        self.setWindowTitle(f"Tarefas do/a {self.user.nome}")
+        self.setWindowTitle(f"FocusFlow | Tarefas do/a {self.user.nome}")
         self.setStyleSheet(open("styles/style.qss", "r").read())
-        self.setGeometry(400, 200, 800, 500)
+        self.setGeometry(300, 50, 1000, 700)
 
-        # Layout principal (duas colunas)
-        layout_principal = QHBoxLayout()
+        # Layout geral (vertical)
+        layout_geral = QVBoxLayout()
+
+        """====================================="""
+        # Navbar (linha superior com botões)
+        """====================================="""
+        layout_navbar = QHBoxLayout()
+
+        # Botão "Voltar"
+        self.btn_retroceder = QPushButton("Voltar")
+        self.btn_retroceder.setFixedWidth(100)
+        self.btn_retroceder.clicked.connect(self.voltar_login)
+        layout_navbar.addWidget(self.btn_retroceder)
+
+        # logo
+        self.logo = QLabel()
+        pixmap = QPixmap('assets/logo_focusflow_lettering.png')
+        self.logo.setPixmap(pixmap.scaled(
+            100, 100, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
+        layout_navbar.addWidget(
+            self.logo, alignment=Qt.AlignmentFlag.AlignHCenter)
+
+        # Centralizar os botões no navbar
+        layout_navbar.setAlignment(Qt.AlignmentFlag.AlignLeft)
+
+        # Adicionar o navbar ao layout geral
+        layout_geral.addLayout(layout_navbar)
 
         """====================================="""
         # Coluna 1: Lista de tarefas e pesquisa
         """====================================="""
+
+        # Layout principal (duas colunas)
+        layout_principal = QHBoxLayout()
+
         coluna_lista_tarefas = QVBoxLayout()
 
         # Campo de pesquisa
@@ -72,6 +103,10 @@ class UserUI(QWidget):
 
         # Adicionar a coluna de detalhes ao layout principal
         layout_principal.addLayout(coluna_detalhes_tarefa)
+
+        layout_geral.addLayout(layout_principal)
+
+        self.setLayout(layout_geral)
 
         # Configurar o layout principal
         self.setLayout(layout_principal)
@@ -176,3 +211,9 @@ class UserUI(QWidget):
             prazo = tarefa.prazo if tarefa.prazo else "Sem prazo"
             self.lista_tarefas.addItem(
                 f"{status} {tarefa.titulo} - {tarefa.prioridade} - {prazo}")
+
+    def voltar_login(self):
+        from ui.loginUI import LoginUI
+        self.close()
+        self.login = LoginUI()
+        self.login.show()
