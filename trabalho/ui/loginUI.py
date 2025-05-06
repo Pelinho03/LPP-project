@@ -4,6 +4,7 @@ from PyQt6.QtGui import QPixmap
 from ui.adminUI import GestorTarefas
 from ui.userUI import UserUI
 from user.user_json import carregar_utilizadores
+import os
 
 
 class LoginUI(QWidget):
@@ -11,7 +12,16 @@ class LoginUI(QWidget):
         super().__init__()
 
         self.setWindowTitle("FocusFlow | Login")
-        self.setStyleSheet(open("styles/login.qss", "r").read())
+
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        qss_path = os.path.join(current_dir, "../styles/style.qss")
+
+        try:
+            with open(qss_path, "r") as f:
+                self.setStyleSheet(f.read())
+        except FileNotFoundError:
+            print(f"Arquivo de estilo não encontrado: {qss_path}")
+
         self.setGeometry(300, 50, 1000, 700)
 
         layout = QVBoxLayout()
@@ -22,7 +32,10 @@ class LoginUI(QWidget):
 
         # Imagem
         self.image = QLabel()
-        pixmap = QPixmap('assets/logo_focusflow_complete.png')
+        logo_dir = os.path.dirname(os.path.abspath(__file__))
+        assets_path = os.path.join(
+            logo_dir, "../assets/logo_focusflow_complete.png")
+        pixmap = QPixmap(assets_path)
         self.image.setPixmap(pixmap.scaled(
             250, 250, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
         self.image.setAlignment(Qt.AlignmentFlag.AlignHCenter)

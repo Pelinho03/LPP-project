@@ -2,7 +2,8 @@ import json
 import os
 from tarefa.tarefa import Tarefa
 
-FILENAME = "json/tarefas.json"
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+FILENAME = os.path.join(BASE_DIR, "json", "tarefas.json")
 
 
 def carregar_tarefas(utilizadores=None):

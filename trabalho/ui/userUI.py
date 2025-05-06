@@ -3,6 +3,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap
 from tarefa.tarefa_json import carregar_tarefas
 from user.user_json import carregar_utilizadores
+import os
 
 
 class UserUI(QWidget):
@@ -11,7 +12,14 @@ class UserUI(QWidget):
         self.user = user
         self.tarefas_user = []  # Armazena as tarefas associadas ao utilizador
         self.setWindowTitle(f"FocusFlow | Tarefas do/a {self.user.nome}")
-        self.setStyleSheet(open("styles/style.qss", "r").read())
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        qss_path = os.path.join(current_dir, "../styles/style.qss")
+
+        try:
+            with open(qss_path, "r") as f:
+                self.setStyleSheet(f.read())
+        except FileNotFoundError:
+            print(f"Arquivo de estilo não encontrado: {qss_path}")
         self.setGeometry(300, 50, 1000, 700)
 
         # Layout geral (vertical)
@@ -30,7 +38,10 @@ class UserUI(QWidget):
 
         # logo
         self.logo = QLabel()
-        pixmap = QPixmap('assets/logo_focusflow_lettering.png')
+        logo_dir = os.path.dirname(os.path.abspath(__file__))
+        assets_path = os.path.join(
+            logo_dir, "../assets/logo_focusflow_lettering.png")
+        pixmap = QPixmap(assets_path)
         self.logo.setPixmap(pixmap.scaled(
             100, 100, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
         layout_navbar.addWidget(

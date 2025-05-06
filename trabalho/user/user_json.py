@@ -2,7 +2,8 @@ import json
 import os
 from user.user import User
 
-FILENAME = "json/utilizadores.json"
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+FILENAME = os.path.join(BASE_DIR, "json", "utilizadores.json")
 
 
 def carregar_utilizadores():
