@@ -10,6 +10,7 @@ from tarefa.tarefa import Tarefa
 from user.user_json import carregar_utilizadores, guardar_utilizadores
 from user.user import User
 from notificações.notifications import notificar_tarefa
+import os
 
 
 class GestorTarefas(QWidget):
@@ -19,7 +20,14 @@ class GestorTarefas(QWidget):
         self.utilizadores = carregar_utilizadores()
         self.tarefas = carregar_tarefas(self.utilizadores)
         self.setWindowTitle("FocusFlow | Admin")
-        self.setStyleSheet(open("styles/style.qss", "r").read())
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        qss_path = os.path.join(current_dir, "../styles/style.qss")
+
+        try:
+            with open(qss_path, "r") as f:
+                self.setStyleSheet(f.read())
+        except FileNotFoundError:
+            print(f"Arquivo de estilo não encontrado: {qss_path}")
         self.setGeometry(300, 50, 1000, 700)
 
         # Layout geral (vertical)
@@ -38,7 +46,10 @@ class GestorTarefas(QWidget):
 
         # logo
         self.logo = QLabel()
-        pixmap = QPixmap('assets/logo_focusflow_lettering.png')
+        logo_dir = os.path.dirname(os.path.abspath(__file__))
+        assets_path = os.path.join(
+            logo_dir, "../assets/logo_focusflow_lettering.png")
+        pixmap = QPixmap(assets_path)
         self.logo.setPixmap(pixmap.scaled(
             100, 100, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
         layout_navbar.addWidget(
