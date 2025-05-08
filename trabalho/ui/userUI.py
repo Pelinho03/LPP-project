@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QListWidget, QLineEdit, QTextEdit, QHBoxLayout, QPushButton, QLabel
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QListWidget, QLineEdit, QTextEdit, QHBoxLayout, QPushButton, QLabel, QSpacerItem, QSizePolicy
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap
 from tarefa.tarefa_json import carregar_tarefas
@@ -7,11 +7,12 @@ import os
 
 
 class UserUI(QWidget):
-    def __init__(self, user):
+    def __init__(self, utilizador_logado):
         super().__init__()
-        self.user = user
+        self.utilizador_logado = utilizador_logado
         self.tarefas_user = []  # Armazena as tarefas associadas ao utilizador
-        self.setWindowTitle(f"FocusFlow | Tarefas do/a {self.user.nome}")
+        self.setWindowTitle(
+            f"FocusFlow | Tarefas do/a {self.utilizador_logado.nome}")
         current_dir = os.path.dirname(os.path.abspath(__file__))
         qss_path = os.path.join(current_dir, "../styles/style.qss")
 
@@ -36,19 +37,32 @@ class UserUI(QWidget):
         self.btn_retroceder.clicked.connect(self.voltar_login)
         layout_navbar.addWidget(self.btn_retroceder)
 
-        # logo
+        # Spacer para empurrar o logo para o centro
+        layout_navbar.addSpacerItem(QSpacerItem(
+            40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
+
+        # Logo
         self.logo = QLabel()
         logo_dir = os.path.dirname(os.path.abspath(__file__))
         assets_path = os.path.join(
             logo_dir, "../assets/logo_focusflow_lettering.png")
         pixmap = QPixmap(assets_path)
         self.logo.setPixmap(pixmap.scaled(
-            100, 100, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
-        layout_navbar.addWidget(
-            self.logo, alignment=Qt.AlignmentFlag.AlignHCenter)
+            100, 100,
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation
+        ))
+        layout_navbar.addWidget(self.logo)
 
-        # Centralizar os botões no navbar
-        layout_navbar.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        # Outro spacer para empurrar o label para a direita
+        layout_navbar.addSpacerItem(QSpacerItem(
+            40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
+
+        # Label de equipa
+        self.equipa_label = QLabel()
+        self.equipa_label.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.equipa_label.setStyleSheet("font-weight: bold; font-size: 16px;")
+        layout_navbar.addWidget(self.equipa_label)
 
         # Adicionar o navbar ao layout geral
         layout_geral.addLayout(layout_navbar)
@@ -125,13 +139,16 @@ class UserUI(QWidget):
         # Carregar tarefas associadas ao utilizador
         self.carregar_tarefas()
 
+        # Atualizar o texto da equipa
+        self.atualizar_equipa_trabalho()
+
     def carregar_tarefas(self):
         """Carrega as tarefas associadas ao utilizador."""
         utilizadores = carregar_utilizadores()  # Carregar todos os utilizadores
         # Carregar todas as tarefas com utilizadores associados
         tarefas = carregar_tarefas(utilizadores)
         self.tarefas_user = [
-            t for t in tarefas if t.utilizador and t.utilizador.email == self.user.email]
+            t for t in tarefas if t.utilizador and t.utilizador.email == self.utilizador_logado.email]
         self.lista_tarefas.clear()
         for tarefa in self.tarefas_user:
             status = "[🟢]" if tarefa.concluida else "[🔴]"
@@ -148,6 +165,7 @@ class UserUI(QWidget):
 
         tarefa = self.tarefas_user[index]
         detalhes = (
+            f"Id: {tarefa.id}\n"
             f"Título: {tarefa.titulo}\n"
             f"-----------------------------------------------------------\n"
             f"Descrição: {tarefa.descricao}\n"
@@ -164,7 +182,7 @@ class UserUI(QWidget):
         texto_pesquisa = self.campo_pesquisa.text().lower()
         tarefas = carregar_tarefas()
         tarefas_user = [
-            t for t in tarefas if t.utilizador and t.utilizador.email == self.user.email]
+            t for t in tarefas if t.utilizador and t.utilizador.email == self.utilizador_logado.email]
         tarefas_filtradas = [
             t for t in tarefas_user if texto_pesquisa in t.titulo.lower()]
         self.lista_tarefas.clear()
@@ -180,7 +198,7 @@ class UserUI(QWidget):
         if index >= 0:
             tarefas = carregar_tarefas()
             tarefas_user = [
-                t for t in tarefas if t.utilizador and t.utilizador.email == self.user.email]
+                t for t in tarefas if t.utilizador and t.utilizador.email == self.utilizador_logado.email]
             tarefa = tarefas_user[index]
             tarefa.concluida = False
             self.carregar_tarefas()
@@ -191,7 +209,7 @@ class UserUI(QWidget):
         if index >= 0:
             tarefas = carregar_tarefas()
             tarefas_user = [
-                t for t in tarefas if t.utilizador and t.utilizador.email == self.user.email]
+                t for t in tarefas if t.utilizador and t.utilizador.email == self.utilizador_logado.email]
             tarefa = tarefas_user[index]
             tarefa.concluida = True
             self.carregar_tarefas()
@@ -201,7 +219,7 @@ class UserUI(QWidget):
         prioridades = {"Alta": 0, "Média": 1, "Baixa": 2}
         tarefas = carregar_tarefas()
         tarefas_user = [
-            t for t in tarefas if t.utilizador and t.utilizador.email == self.user.email]
+            t for t in tarefas if t.utilizador and t.utilizador.email == self.utilizador_logado.email]
         tarefas_user.sort(key=lambda t: prioridades.get(t.prioridade, 3))
         self.lista_tarefas.clear()
         for tarefa in tarefas_user:
@@ -214,7 +232,7 @@ class UserUI(QWidget):
         """Ordena as tarefas por data."""
         tarefas = carregar_tarefas()
         tarefas_user = [
-            t for t in tarefas if t.utilizador and t.utilizador.email == self.user.email]
+            t for t in tarefas if t.utilizador and t.utilizador.email == self.utilizador_logado.email]
         tarefas_user.sort(key=lambda t: t.prazo or "")
         self.lista_tarefas.clear()
         for tarefa in tarefas_user:
@@ -222,6 +240,17 @@ class UserUI(QWidget):
             prazo = tarefa.prazo if tarefa.prazo else "Sem prazo"
             self.lista_tarefas.addItem(
                 f"{status} {tarefa.titulo} - {tarefa.prioridade} - {prazo}")
+
+    def atualizar_equipa_trabalho(self):
+        user = self.utilizador_logado
+        if user.grupo == "admin":
+            self.equipa_label.setText("Admin Panel")
+        elif user.grupo == "developer":
+            self.equipa_label.setText("Developer Team")
+        elif user.grupo == "designer":
+            self.equipa_label.setText("Designer Team")
+        else:
+            self.equipa_label.setText("Equipe desconhecida")
 
     def voltar_login(self):
         from ui.loginUI import LoginUI

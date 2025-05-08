@@ -80,12 +80,12 @@ class LoginUI(QWidget):
             return
 
         if user.grupo == "admin":
-            self.abrir_ui_admin()
+            self.abrir_ui_admin(user)
         else:
             self.abrir_ui_user(user)
 
-    def abrir_ui_admin(self):
-        self.ui_admin = GestorTarefas()
+    def abrir_ui_admin(self, user):
+        self.ui_admin = GestorTarefas(user)
         self.ui_admin.show()
         self.close()
 

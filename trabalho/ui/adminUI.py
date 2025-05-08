@@ -1,6 +1,6 @@
 import datetime
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QPushButton, QListWidget,
-                             QHBoxLayout, QLineEdit, QTextEdit, QComboBox, QDateEdit, QMessageBox, QInputDialog, QLabel
+                             QHBoxLayout, QLineEdit, QTextEdit, QComboBox, QDateEdit, QMessageBox, QInputDialog, QLabel, QSpacerItem, QSizePolicy
                              )
 from PyQt6.QtCore import Qt
 from PyQt6.QtCore import QDate
@@ -14,9 +14,10 @@ import os
 
 
 class GestorTarefas(QWidget):
-    def __init__(self):
+    def __init__(self, utilizador_logado):
         super().__init__()
 
+        self.utilizador_logado = utilizador_logado
         self.utilizadores = carregar_utilizadores()
         self.tarefas = carregar_tarefas(self.utilizadores)
         self.setWindowTitle("FocusFlow | Admin")
@@ -44,23 +45,35 @@ class GestorTarefas(QWidget):
         self.btn_retroceder.clicked.connect(self.voltar_login)
         layout_navbar.addWidget(self.btn_retroceder)
 
-        # logo
+        # Spacer para empurrar o logo para o centro
+        layout_navbar.addSpacerItem(QSpacerItem(
+            40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
+
+        # Logo
         self.logo = QLabel()
         logo_dir = os.path.dirname(os.path.abspath(__file__))
         assets_path = os.path.join(
             logo_dir, "../assets/logo_focusflow_lettering.png")
         pixmap = QPixmap(assets_path)
         self.logo.setPixmap(pixmap.scaled(
-            100, 100, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
-        layout_navbar.addWidget(
-            self.logo, alignment=Qt.AlignmentFlag.AlignHCenter)
+            100, 100,
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation
+        ))
+        layout_navbar.addWidget(self.logo)
 
-        # Centralizar os botões no navbar
-        layout_navbar.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        # Outro spacer para empurrar o label para a direita
+        layout_navbar.addSpacerItem(QSpacerItem(
+            40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
+
+        # Label de equipa
+        self.equipa_label = QLabel()
+        self.equipa_label.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.equipa_label.setStyleSheet("font-weight: bold; font-size: 16px;")
+        layout_navbar.addWidget(self.equipa_label)
 
         # Adicionar o navbar ao layout geral
         layout_geral.addLayout(layout_navbar)
-
         """====================================="""
         # Layout principal (duas colunas)
         """====================================="""
@@ -174,10 +187,14 @@ class GestorTarefas(QWidget):
         self.atualizar_utilizadores()
         self.atualizar_lista()
 
+        # Atualizar o texto da equipa
+        self.atualizar_equipa_trabalho()
+
     def exibir_detalhes_tarefa(self, item):
         index = self.lista_tarefas.row(item)
         tarefa = self.tarefas[index]
         detalhes = (
+            f"Id: {tarefa.id}\n"
             f"Título: {tarefa.titulo}\n"
             f"-----------------------------------------------------------\n"
             f"Descrição: {tarefa.descricao}\n"
@@ -347,7 +364,18 @@ class GestorTarefas(QWidget):
         if not ok_grupo:
             return
 
-        novo_user = User(nome.strip(), email.strip(), grupo)
-        self.utilizadores.append(novo_user)
+    def atualizar_equipa_trabalho(self):
+        user = self.utilizador_logado
+        if user.grupo == "admin":
+            self.equipa_label.setText("Admin Panel")
+        elif user.grupo == "developer":
+            self.equipa_label.setText("Developer Team")
+        elif user.grupo == "designer":
+            self.equipa_label.setText("Designer Team")
+        else:
+            self.equipa_label.setText("Equipe desconhecida")
+
+        # novo_user = User(nome.strip(), email.strip(), grupo)
+        # self.utilizadores.append(novo_user)
         guardar_utilizadores(self.utilizadores)
         self.atualizar_utilizadores()
