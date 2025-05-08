@@ -1,96 +1,96 @@
 /* Estilo geral */
 QWidget {
-    background-color: #0f172a; /* Fundo principal */
-    color: #e2e8f0; /* Cor de texto */
+    background-color: #0f172a;
+    color: #e2e8f0;
     font-family: "Segoe UI", Arial, sans-serif;
     font-size: 14px;
 }
 
 /* Botões (QPushButton) */
 QPushButton {
-    background-color: #4f46e5; /* Cor primária */
+    background-color: #4f46e5;
     border: none;
-    border-radius: 6px; /* Bordas arredondadas */
-    padding: 10px 15px; /* Espaçamento interno */
-    color: #e2e8f0; /* Cor do texto */
-    font-weight: bold; /* Texto em negrito */
+    border-radius: 6px;
+    padding: 10px 15px;
+    color: #e2e8f0; 
+    font-weight: bold; 
 }
 
 QPushButton:hover {
-    background-color: #7c3aed; /* Cor secundária ao passar o rato */
+    background-color: #7c3aed; 
 }
 
 QPushButton:pressed {
-    background-color: #372d91; /* Tom mais escuro ao clicar */
+    background-color: #372d91;
 }
 
 /* Campos de entrada (QLineEdit, QTextEdit) */
-QLineEdit, QTextEdit {
-    background-color: #0a0f1c; /* Fundo secundário */
-    border: 1px solid #4f46e5; /* Cor primária para borda */
-    border-radius: 6px; /* Bordas arredondadas */
-    padding: 8px; /* Espaçamento interno */
-    color: #e2e8f0; /* Cor do texto */
+QLineEdit, QTextEdit, QListWidget {
+    background-color: #0a0f1c;
+    border: 1px solid #4f46e5;
+    border-radius: 6px;
+    padding: 8px;
+    color: #e2e8f0;
     font-size: 14px;
 }
 
 QLineEdit:focus, QTextEdit:focus {
-    border: 1px solid #7c3aed; /* Cor secundária ao focar */
+    border: 1px solid #7c3aed;
 }
 
 /* Combobox (QComboBox) */
-QComboBox {
-    background-color: #0a0f1c; /* Fundo secundário */
-    border: 1px solid #4f46e5; /* Cor primária para borda */
-    border-radius: 6px; /* Bordas arredondadas */
-    padding: 8px; /* Espaçamento interno */
-    color: #e2e8f0; /* Cor do texto */
+QComboBox, QDateEdit {
+    background-color: #0a0f1c;
+    border: 1px solid #4f46e5; 
+    border-radius: 6px;
+    padding: 8px;
+    color: #e2e8f0;
 }
 
 QComboBox:hover {
-    border: 1px solid #7c3aed; /* Cor secundária ao passar o rato */
+    border: 1px solid #7c3aed; 
 }
 
 QComboBox::drop-down {
     border: none;
-    background-color: #4f46e5; /* Fundo do dropdown */
-    border-radius: 6px; /* Bordas arredondadas */
+    background-color: #4f46e5;
+    border-radius: 6px;
 }
 
 /* Checkbox (QCheckBox) */
 QCheckBox {
-    color: #e2e8f0; /* Cor do texto */
-    spacing: 8px; /* Espaçamento entre a caixa e o texto */
+    color: #e2e8f0;
+    spacing: 8px;
 }
 
 QCheckBox::indicator {
     width: 16px;
     height: 16px;
-    border: 1px solid #4f46e5; /* Cor primária para borda */
-    border-radius: 4px; /* Bordas arredondadas */
-    background-color: #0a0f1c; /* Fundo secundário */
+    border: 1px solid #4f46e5; 
+    border-radius: 4px; 
+    background-color: #0a0f1c;
 }
 
 QCheckBox::indicator:checked {
-    background-color: #4f46e5; /* Fundo ao marcar */
-    border: 1px solid #7c3aed; /* Cor secundária ao marcar */
+    background-color: #4f46e5; 
+    border: 1px solid #7c3aed;
 }
 
 /* Scrollbars */
 QScrollBar:vertical, QScrollBar:horizontal {
-    background-color: #0a0f1c; /* Fundo secundário */
+    background-color: #0a0f1c; 
     border: none;
     width: 10px;
     margin: 2px;
 }
 
 QScrollBar::handle {
-    background-color: #4f46e5; /* Cor da barra */
-    border-radius: 5px; /* Bordas arredondadas */
+    background-color: #4f46e5; 
+    border-radius: 5px; 
 }
 
 QScrollBar::handle:hover {
-    background-color: #7c3aed; /* Cor secundária ao passar o rato */
+    background-color: #7c3aed; 
 }
 
 QScrollBar::add-line, QScrollBar::sub-line {
@@ -100,30 +100,30 @@ QScrollBar::add-line, QScrollBar::sub-line {
 
 /* QMessageBox */
 QMessageBox {
-    background-color: #0a0f1c; /* Fundo secundário */
-    color: #e2e8f0; /* Cor do texto */
-    border: 1px solid #4f46e5; /* Cor primária para borda */
-    border-radius: 6px; /* Bordas arredondadas */
+    background-color: #0a0f1c;
+    color: #e2e8f0;
+    border: 1px solid #4f46e5; 
+    border-radius: 6px;
 }
 
 QMessageBox QLabel {
-    color: #e2e8f0; /* Cor do texto */
+    color: #e2e8f0; 
     font-size: 14px;
 }
 
 QMessageBox QPushButton {
-    background-color: #4f46e5; /* Cor primária */
+    background-color: #4f46e5; 
     border: none;
-    border-radius: 6px; /* Bordas arredondadas */
-    padding: 8px 12px; /* Espaçamento interno */
-    color: #e2e8f0; /* Cor do texto */
-    font-weight: bold; /* Texto em negrito */
+    border-radius: 6px; 
+    padding: 8px 12px;
+    color: #e2e8f0; 
+    font-weight: bold;
 }
 
 QMessageBox QPushButton:hover {
-    background-color: #7c3aed; /* Cor secundária ao passar o rato */
+    background-color: #7c3aed; 
 }
 
 QMessageBox QPushButton:pressed {
-    background-color: #372d91; /* Tom mais escuro ao clicar */
+    background-color: #372d91;
 }
