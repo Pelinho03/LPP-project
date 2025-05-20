@@ -1,5 +1,5 @@
 class Tarefa:
-    def __init__(self, id, titulo, descricao, prioridade, prazo=None, concluida=False, utilizador=None):
+    def __init__(self, id, titulo, descricao, prioridade, prazo=None, concluida=False, utilizador=None, bloqueada=False):
         self.id = id
         self.titulo = titulo
         self.descricao = descricao
@@ -7,6 +7,7 @@ class Tarefa:
         self.prazo = prazo
         self.concluida = concluida
         self.utilizador = utilizador
+        self.bloqueada = bloqueada
 
     def to_dict(self):
         return {
@@ -16,7 +17,8 @@ class Tarefa:
             "prioridade": self.prioridade,
             "prazo": self.prazo,
             "concluida": self.concluida,
-            "utilizador": self.utilizador.nome if self.utilizador else None
+            "utilizador": self.utilizador.nome if self.utilizador else None,
+            "bloqueada": self.bloqueada
         }
 
     @classmethod
@@ -28,7 +30,8 @@ class Tarefa:
             prioridade=data["prioridade"],
             prazo=data.get("prazo"),
             concluida=data.get("concluida", False),
-            utilizador=None
+            utilizador=None,
+            bloqueada=data.get("bloqueada", False)
         )
 
     def __str__(self):

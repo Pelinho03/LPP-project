@@ -5,6 +5,17 @@ class User:
         self.grupo = grupo
         self.tarefas = []
 
+    def to_dict(self):
+        return {
+            "nome": self.nome,
+            "email": self.email,
+            "grupo": self.grupo
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(data["nome"], data["email"], data.get("grupo", "user"))
+
     def adicionar_tarefa(self, tarefa):
         if tarefa not in self.tarefas:
             self.tarefas.append(tarefa)
@@ -20,14 +31,3 @@ class User:
 
     def __str__(self):
         return f"Nome: {self.nome}, Email: {self.email}, Tarefas: {len(self.tarefas)}"
-
-    def to_dict(self):
-        return {
-            "nome": self.nome,
-            "email": self.email,
-            "grupo": self.grupo
-        }
-
-    @classmethod
-    def from_dict(cls, data):
-        return cls(data["nome"], data["email"], data.get("grupo", "user"))

@@ -1,7 +1,7 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QListWidget, QLineEdit, QTextEdit, QHBoxLayout, QPushButton, QLabel, QSpacerItem, QSizePolicy
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QListWidget, QLineEdit, QTextEdit, QHBoxLayout, QPushButton, QLabel, QSpacerItem, QSizePolicy, QMessageBox
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap
-from tarefa.tarefa_json import carregar_tarefas
+from tarefa.tarefa_json import carregar_tarefas, guardar_tarefas
 from user.user_json import carregar_utilizadores
 import os
 
@@ -151,10 +151,11 @@ class UserUI(QWidget):
             t for t in tarefas if t.utilizador and t.utilizador.email == self.utilizador_logado.email]
         self.lista_tarefas.clear()
         for tarefa in self.tarefas_user:
+            lock = "[🔒]" if tarefa.bloqueada else ""
             status = "[🟢]" if tarefa.concluida else "[🔴]"
             prazo = tarefa.prazo if tarefa.prazo else "Sem prazo"
             self.lista_tarefas.addItem(
-                f"{status} {tarefa.titulo} - {tarefa.prioridade} - {prazo}")
+                f"{lock} {status} {tarefa.titulo} - {tarefa.prioridade} - {prazo}")
 
     def exibir_detalhes_tarefa(self, item):
         """Exibe os detalhes da tarefa selecionada no visor."""
@@ -167,6 +168,7 @@ class UserUI(QWidget):
         detalhes = (
             f"Id: {tarefa.id}\n"
             f"Título: {tarefa.titulo}\n"
+            f"Estado: {self.estado_tarefa(tarefa)}\n"
             f"-----------------------------------------------------------\n"
             f"Descrição: {tarefa.descricao}\n"
             f"-----------------------------------------------------------\n"
@@ -187,59 +189,97 @@ class UserUI(QWidget):
             t for t in tarefas_user if texto_pesquisa in t.titulo.lower()]
         self.lista_tarefas.clear()
         for tarefa in tarefas_filtradas:
+            lock = "[🔒]" if tarefa.bloqueada else ""
             status = "[✔]" if tarefa.concluida else "[ ]"
             prazo = tarefa.prazo if tarefa.prazo else "Sem prazo"
             self.lista_tarefas.addItem(
-                f"{status} {tarefa.titulo} - {tarefa.prioridade} - {prazo}")
+                f"{lock} {status} {tarefa.titulo} - {tarefa.prioridade} - {prazo}")
+
+    def estado_tarefa(self, tarefa):
+        return "Bloqueada" if getattr(tarefa, "bloqueada", False) else "Desbloqueada"
 
     def desmarcar_tarefa(self):
-        """desmarca a tarefa selecionada."""
         index = self.lista_tarefas.currentRow()
         if index >= 0:
-            tarefas = carregar_tarefas()
-            tarefas_user = [
-                t for t in tarefas if t.utilizador and t.utilizador.email == self.utilizador_logado.email]
-            tarefa = tarefas_user[index]
-            tarefa.concluida = False
-            self.carregar_tarefas()
+            utilizadores = carregar_utilizadores()
+        tarefas = carregar_tarefas(utilizadores)
+        tarefa_selecionada = self.tarefas_user[index]
+
+        if tarefa_selecionada.bloqueada:
+            QMessageBox.warning(self, "Acesso negado",
+                                "Esta tarefa está bloqueada.")
+            return
+
+        for t in tarefas:
+            if t.id == tarefa_selecionada.id:
+                t.concluida = False
+                break
+
+        guardar_tarefas(tarefas)
+        self.carregar_tarefas()
 
     def marcar_concluida(self):
-        """Marca a tarefa selecionada como concluída."""
         index = self.lista_tarefas.currentRow()
         if index >= 0:
-            tarefas = carregar_tarefas()
-            tarefas_user = [
-                t for t in tarefas if t.utilizador and t.utilizador.email == self.utilizador_logado.email]
-            tarefa = tarefas_user[index]
-            tarefa.concluida = True
-            self.carregar_tarefas()
+            utilizadores = carregar_utilizadores()
+            tarefas = carregar_tarefas(utilizadores)
+
+        # Obter a tarefa selecionada da lista filtrada do utilizador
+        tarefa_selecionada = self.tarefas_user[index]
+
+        # Verificar bloqueio
+        if tarefa_selecionada.bloqueada:
+            QMessageBox.warning(self, "Acesso negado",
+                                "Esta tarefa está bloqueada.")
+            return
+
+        # Atualizar a tarefa correta na lista principal
+        for t in tarefas:
+            if t.id == tarefa_selecionada.id:
+                t.concluida = True
+                break
+
+        guardar_tarefas(tarefas)
+        self.carregar_tarefas()
 
     def ordenar_por_prioridade(self):
         """Ordena as tarefas por prioridade."""
         prioridades = {"Alta": 0, "Média": 1, "Baixa": 2}
-        tarefas = carregar_tarefas()
+        utilizadores = carregar_utilizadores()
+        tarefas = carregar_tarefas(utilizadores)
+
         tarefas_user = [
             t for t in tarefas if t.utilizador and t.utilizador.email == self.utilizador_logado.email]
         tarefas_user.sort(key=lambda t: prioridades.get(t.prioridade, 3))
+
+        self.tarefas_user = tarefas_user
+
         self.lista_tarefas.clear()
         for tarefa in tarefas_user:
-            status = "[✔]" if tarefa.concluida else "[ ]"
+            lock = "[🔒]" if tarefa.bloqueada else ""
+            status = "[🟢]" if tarefa.concluida else "[🔴]"
             prazo = tarefa.prazo if tarefa.prazo else "Sem prazo"
             self.lista_tarefas.addItem(
-                f"{status} {tarefa.titulo} - {tarefa.prioridade} - {prazo}")
+                f"{lock} {status} {tarefa.titulo} - {tarefa.prioridade} - {prazo}")
 
     def ordenar_por_data(self):
         """Ordena as tarefas por data."""
-        tarefas = carregar_tarefas()
+        utilizadores = carregar_utilizadores()
+        tarefas = carregar_tarefas(utilizadores)
+
         tarefas_user = [
             t for t in tarefas if t.utilizador and t.utilizador.email == self.utilizador_logado.email]
         tarefas_user.sort(key=lambda t: t.prazo or "")
+
+        self.tarefas_user = tarefas_user
+
         self.lista_tarefas.clear()
         for tarefa in tarefas_user:
-            status = "[✔]" if tarefa.concluida else "[ ]"
+            lock = "[🔒]" if tarefa.bloqueada else ""
+            status = "[🟢]" if tarefa.concluida else "[🔴]"
             prazo = tarefa.prazo if tarefa.prazo else "Sem prazo"
             self.lista_tarefas.addItem(
-                f"{status} {tarefa.titulo} - {tarefa.prioridade} - {prazo}")
+                f"{lock} {status} {tarefa.titulo} - {tarefa.prioridade} - {prazo}")
 
     def atualizar_equipa_trabalho(self):
         user = self.utilizador_logado
