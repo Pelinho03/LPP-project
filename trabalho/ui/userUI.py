@@ -224,23 +224,33 @@ class UserUI(QWidget):
             utilizadores = carregar_utilizadores()
             tarefas = carregar_tarefas(utilizadores)
 
-        # Obter a tarefa selecionada da lista filtrada do utilizador
-        tarefa_selecionada = self.tarefas_user[index]
+            tarefa_selecionada = self.tarefas_user[index]
 
-        # Verificar bloqueio
-        if tarefa_selecionada.bloqueada:
-            QMessageBox.warning(self, "Acesso negado",
-                                "Esta tarefa está bloqueada.")
-            return
+            # Verificar bloqueio
+            if tarefa_selecionada.bloqueada:
+                QMessageBox.warning(self, "Acesso negado",
+                                    "Esta tarefa está bloqueada.")
+                return
 
-        # Atualizar a tarefa correta na lista principal
-        for t in tarefas:
-            if t.id == tarefa_selecionada.id:
-                t.concluida = True
-                break
+            # Atualizar a tarefa correta na lista principal
+            for t in tarefas:
+                if t.id == tarefa_selecionada.id:
+                    t.concluida = True
+                    break
 
-        guardar_tarefas(tarefas)
-        self.carregar_tarefas()
+            # Desbloquear a tarefa com o id seguinte (se existir e estiver bloqueada)
+            next_id = tarefa_selecionada.id + 1
+            for t in tarefas:
+                if t.id == next_id and getattr(t, "bloqueada", False):
+                    t.bloqueada = False
+                    QMessageBox.information(
+                        self, "Desbloqueada",
+                        f"A tarefa '{t.titulo}' foi desbloqueada!"
+                    )
+                    break
+
+            guardar_tarefas(tarefas)
+            self.carregar_tarefas()
 
     def ordenar_por_prioridade(self):
         """Ordena as tarefas por prioridade."""
