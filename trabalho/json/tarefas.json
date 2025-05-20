@@ -6,7 +6,8 @@
         "prioridade": "Alta",
         "prazo": "2025-04-30",
         "concluida": false,
-        "utilizador": "Gon\u00e7alo"
+        "utilizador": "Gon\u00e7alo",
+        "bloqueada": false
     },
     {
         "id": 2,
@@ -15,7 +16,8 @@
         "prioridade": "M\u00e9dia",
         "prazo": "2025-04-23",
         "concluida": false,
-        "utilizador": "Gon\u00e7alo"
+        "utilizador": "Gon\u00e7alo",
+        "bloqueada": true
     },
     {
         "id": 3,
@@ -24,7 +26,8 @@
         "prioridade": "Baixa",
         "prazo": "2025-04-12",
         "concluida": false,
-        "utilizador": "Daniel"
+        "utilizador": "Daniel",
+        "bloqueada": true
     },
     {
         "id": 4,
@@ -33,7 +36,8 @@
         "prioridade": "Alta",
         "prazo": "2025-05-01",
         "concluida": false,
-        "utilizador": "Paulo"
+        "utilizador": "Paulo",
+        "bloqueada": false
     },
     {
         "id": 5,
@@ -42,7 +46,8 @@
         "prioridade": "Alta",
         "prazo": "2025-05-02",
         "concluida": false,
-        "utilizador": "Paulo"
+        "utilizador": "Paulo",
+        "bloqueada": false
     },
     {
         "id": 6,
@@ -51,7 +56,8 @@
         "prioridade": "M\u00e9dia",
         "prazo": "2025-05-05",
         "concluida": false,
-        "utilizador": "Daniel"
+        "utilizador": "Daniel",
+        "bloqueada": false
     },
     {
         "id": 7,
@@ -60,7 +66,8 @@
         "prioridade": "Alta",
         "prazo": "2025-05-03",
         "concluida": false,
-        "utilizador": "Gon\u00e7alo"
+        "utilizador": "Gon\u00e7alo",
+        "bloqueada": false
     },
     {
         "id": 8,
@@ -69,7 +76,8 @@
         "prioridade": "M\u00e9dia",
         "prazo": "2025-05-07",
         "concluida": false,
-        "utilizador": "Paulo"
+        "utilizador": "Paulo",
+        "bloqueada": false
     },
     {
         "id": 9,
@@ -78,7 +86,8 @@
         "prioridade": "Baixa",
         "prazo": "2025-05-10",
         "concluida": false,
-        "utilizador": "Gon\u00e7alo"
+        "utilizador": "Gon\u00e7alo",
+        "bloqueada": false
     },
     {
         "id": 10,
@@ -87,6 +96,7 @@
         "prioridade": "M\u00e9dia",
         "prazo": "2025-05-04",
         "concluida": false,
-        "utilizador": "Daniel"
+        "utilizador": "Daniel",
+        "bloqueada": false
     }
 ]

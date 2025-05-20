@@ -1,6 +1,6 @@
 import datetime
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QPushButton, QListWidget,
-                             QHBoxLayout, QLineEdit, QTextEdit, QComboBox, QDateEdit, QMessageBox, QInputDialog, QLabel, QSpacerItem, QSizePolicy
+                             QHBoxLayout, QLineEdit, QTextEdit, QComboBox, QDateEdit, QMessageBox, QInputDialog, QLabel, QSpacerItem, QSizePolicy, QMessageBox
                              )
 from PyQt6.QtCore import Qt
 from PyQt6.QtCore import QDate
@@ -159,6 +159,10 @@ class GestorTarefas(QWidget):
         self.btn_editar.clicked.connect(self.editar_tarefa)
         botoes_layout.addWidget(self.btn_editar)
 
+        self.btn_bloquear = QPushButton("Bloquear/Desbloquear")
+        self.btn_bloquear.clicked.connect(self.bloquear_tarefa)
+        botoes_layout.addWidget(self.btn_bloquear)
+
         coluna_lista_tarefas.addLayout(botoes_layout)
 
         # Botões de ordenação
@@ -196,6 +200,7 @@ class GestorTarefas(QWidget):
         detalhes = (
             f"Id: {tarefa.id}\n"
             f"Título: {tarefa.titulo}\n"
+            f"Estado: {self.estado_tarefa(tarefa)}\n"
             f"-----------------------------------------------------------\n"
             f"Descrição: {tarefa.descricao}\n"
             f"-----------------------------------------------------------\n"
@@ -214,9 +219,13 @@ class GestorTarefas(QWidget):
                 t for t in self.tarefas if filtro.lower() in t.titulo.lower()]
         for tarefa in tarefas_filtradas:
             status = "[🟢]" if tarefa.concluida else "[🔴]"
+            lock = "[🔒]" if getattr(tarefa, "bloqueada", False) else ""
             prazo = tarefa.prazo if tarefa.prazo else "Sem prazo"
             self.lista_tarefas.addItem(
-                f"{status} {tarefa.titulo} - {tarefa.prioridade} - {prazo}")
+                f"{lock} {status} {tarefa.titulo} - {tarefa.prioridade} - {prazo}")
+
+    def estado_tarefa(self, tarefa):
+        return "Bloqueada" if getattr(tarefa, "bloqueada", False) else "Desbloqueada"
 
     def pesquisar_tarefa(self):
         texto_pesquisa = self.campo_pesquisa.text()
@@ -278,6 +287,17 @@ class GestorTarefas(QWidget):
             guardar_tarefas(self.tarefas)
             self.atualizar_lista()
 
+    def bloquear_tarefa(self):
+        index = self.lista_tarefas.currentRow()
+        if index >= 0:
+            tarefa = self.tarefas[index]
+            tarefa.bloqueada = not tarefa.bloqueada
+            guardar_tarefas(self.tarefas)
+            estado = "bloqueada" if tarefa.bloqueada else "desbloqueada"
+            QMessageBox.information(
+                self, "Estado da Tarefa", f"Tarefa {estado} com sucesso.")
+            self.atualizar_lista()
+
     def marcar_concluida(self):
         index = self.lista_tarefas.currentRow()
         if index >= 0:
@@ -289,16 +309,21 @@ class GestorTarefas(QWidget):
         index = self.lista_tarefas.currentRow()
         if index >= 0:
             tarefa = self.tarefas[index]
-            self.campo_titulo.setText(tarefa.titulo)
-            self.campo_descricao.setText(tarefa.descricao)
-            self.campo_prioridade.setCurrentText(tarefa.prioridade)
 
-            if tarefa.prazo:
-                data = datetime.datetime.strptime(tarefa.prazo, "%Y-%m-%d")
-                self.campo_prazo.setDate(
-                    QDate(data.year, data.month, data.day))
-            else:
-                self.campo_prazo.setDate(QDate.currentDate())
+        if tarefa.bloqueada:
+            QMessageBox.warning(
+                self, "Acesso negado", "Esta tarefa está bloqueada e não pode ser editada.")
+            return
+
+        self.campo_titulo.setText(tarefa.titulo)
+        self.campo_descricao.setText(tarefa.descricao)
+        self.campo_prioridade.setCurrentText(tarefa.prioridade)
+
+        if tarefa.prazo:
+            data = datetime.datetime.strptime(tarefa.prazo, "%Y-%m-%d")
+            self.campo_prazo.setDate(QDate(data.year, data.month, data.day))
+        else:
+            self.campo_prazo.setDate(QDate.currentDate())
 
             # Remover botão antigo, se existir
             if hasattr(self, 'btn_salvar_edicao'):
@@ -307,7 +332,7 @@ class GestorTarefas(QWidget):
 
             # Criar botão de salvar edição
             self.btn_salvar_edicao = QPushButton("Salvar Edição")
-            self.layout.addWidget(self.btn_salvar_edicao)
+            self.layout().addWidget(self.btn_salvar_edicao)
 
             def salvar_edicao():
                 tarefa.titulo = self.campo_titulo.text()
@@ -379,3 +404,15 @@ class GestorTarefas(QWidget):
         # self.utilizadores.append(novo_user)
         guardar_utilizadores(self.utilizadores)
         self.atualizar_utilizadores()
+
+
+def bloquear_tarefa(self):
+    index = self.lista_tarefas.currentRow()
+    if index >= 0:
+        tarefa = self.tarefas[index]
+        tarefa.bloqueada = not tarefa.bloqueada
+        guardar_tarefas(self.tarefas)
+        estado = "bloqueada" if tarefa.bloqueada else "desbloqueada"
+        QMessageBox.information(
+            self, "Estado", f"Tarefa {estado} com sucesso.")
+        self.atualizar_lista()
