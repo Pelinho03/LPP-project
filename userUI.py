@@ -245,31 +245,43 @@ class UserUI(QWidget):
     def ordenar_por_prioridade(self):
         """Ordena as tarefas por prioridade."""
         prioridades = {"Alta": 0, "Média": 1, "Baixa": 2}
-        tarefas = carregar_tarefas()
+        utilizadores = carregar_utilizadores()
+        tarefas = carregar_tarefas(utilizadores)
+
         tarefas_user = [
             t for t in tarefas if t.utilizador and t.utilizador.email == self.utilizador_logado.email]
         tarefas_user.sort(key=lambda t: prioridades.get(t.prioridade, 3))
+
+        self.tarefas_user = tarefas_user
+
         self.lista_tarefas.clear()
         for tarefa in tarefas_user:
             lock = "[🔒]" if tarefa.bloqueada else ""
-            status = "[✔]" if tarefa.concluida else "[ ]"
+            status = "[🟢]" if tarefa.concluida else "[🔴]"
             prazo = tarefa.prazo if tarefa.prazo else "Sem prazo"
             self.lista_tarefas.addItem(
                 f"{lock} {status} {tarefa.titulo} - {tarefa.prioridade} - {prazo}")
 
+
     def ordenar_por_data(self):
         """Ordena as tarefas por data."""
-        tarefas = carregar_tarefas()
+        utilizadores = carregar_utilizadores()
+        tarefas = carregar_tarefas(utilizadores)
+
         tarefas_user = [
             t for t in tarefas if t.utilizador and t.utilizador.email == self.utilizador_logado.email]
         tarefas_user.sort(key=lambda t: t.prazo or "")
+
+        self.tarefas_user = tarefas_user
+
         self.lista_tarefas.clear()
         for tarefa in tarefas_user:
             lock = "[🔒]" if tarefa.bloqueada else ""
-            status = "[✔]" if tarefa.concluida else "[ ]"
+            status = "[🟢]" if tarefa.concluida else "[🔴]"
             prazo = tarefa.prazo if tarefa.prazo else "Sem prazo"
             self.lista_tarefas.addItem(
                 f"{lock} {status} {tarefa.titulo} - {tarefa.prioridade} - {prazo}")
+
 
     def atualizar_equipa_trabalho(self):
         user = self.utilizador_logado
