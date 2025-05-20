@@ -1,8 +1,13 @@
 [
     {
+        "nome": "Admin",
+        "email": "admin@email.pt",
+        "grupo": "admin"
+    },
+    {
         "nome": "Paulo",
         "email": "paulo@email.pt",
-        "grupo": "admin"
+        "grupo": "developer"
     },
     {
         "nome": "Daniel",

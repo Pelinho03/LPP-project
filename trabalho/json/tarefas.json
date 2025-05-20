@@ -27,7 +27,7 @@
         "prazo": "2025-04-12",
         "concluida": false,
         "utilizador": "Daniel",
-        "bloqueada": true
+        "bloqueada": false
     },
     {
         "id": 4,
@@ -47,7 +47,7 @@
         "prazo": "2025-05-02",
         "concluida": false,
         "utilizador": "Paulo",
-        "bloqueada": false
+        "bloqueada": true
     },
     {
         "id": 6,
@@ -57,7 +57,7 @@
         "prazo": "2025-05-05",
         "concluida": false,
         "utilizador": "Daniel",
-        "bloqueada": false
+        "bloqueada": true
     },
     {
         "id": 7,
@@ -67,7 +67,7 @@
         "prazo": "2025-05-03",
         "concluida": false,
         "utilizador": "Gon\u00e7alo",
-        "bloqueada": false
+        "bloqueada": true
     },
     {
         "id": 8,
@@ -77,7 +77,7 @@
         "prazo": "2025-05-07",
         "concluida": false,
         "utilizador": "Paulo",
-        "bloqueada": false
+        "bloqueada": true
     },
     {
         "id": 9,
@@ -87,7 +87,7 @@
         "prazo": "2025-05-10",
         "concluida": false,
         "utilizador": "Gon\u00e7alo",
-        "bloqueada": false
+        "bloqueada": true
     },
     {
         "id": 10,
@@ -97,6 +97,6 @@
         "prazo": "2025-05-04",
         "concluida": false,
         "utilizador": "Daniel",
-        "bloqueada": false
+        "bloqueada": true
     }
 ]

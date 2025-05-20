@@ -302,6 +302,15 @@ class GestorTarefas(QWidget):
         index = self.lista_tarefas.currentRow()
         if index >= 0:
             self.tarefas[index].concluida = True
+            # Desbloquear a próxima tarefa bloqueada (se existir)
+            for i in range(index + 1, len(self.tarefas)):
+                if getattr(self.tarefas[i], "bloqueada", False):
+                    self.tarefas[i].bloqueada = False
+                    QMessageBox.information(
+                        self, "Desbloqueada",
+                        f"A tarefa '{self.tarefas[i].titulo}' foi desbloqueada!"
+                    )
+                    break  # Só desbloqueia a próxima bloqueada
             guardar_tarefas(self.tarefas)
             self.atualizar_lista()
 
@@ -405,14 +414,13 @@ class GestorTarefas(QWidget):
         guardar_utilizadores(self.utilizadores)
         self.atualizar_utilizadores()
 
-
-def bloquear_tarefa(self):
-    index = self.lista_tarefas.currentRow()
-    if index >= 0:
-        tarefa = self.tarefas[index]
-        tarefa.bloqueada = not tarefa.bloqueada
-        guardar_tarefas(self.tarefas)
-        estado = "bloqueada" if tarefa.bloqueada else "desbloqueada"
-        QMessageBox.information(
-            self, "Estado", f"Tarefa {estado} com sucesso.")
-        self.atualizar_lista()
+    def bloquear_tarefa(self):
+        index = self.lista_tarefas.currentRow()
+        if index >= 0:
+            tarefa = self.tarefas[index]
+            tarefa.bloqueada = not tarefa.bloqueada
+            guardar_tarefas(self.tarefas)
+            estado = "bloqueada" if tarefa.bloqueada else "desbloqueada"
+            QMessageBox.information(
+                self, "Estado", f"Tarefa {estado} com sucesso.")
+            self.atualizar_lista()
