@@ -413,14 +413,3 @@ class GestorTarefas(QWidget):
         # self.utilizadores.append(novo_user)
         guardar_utilizadores(self.utilizadores)
         self.atualizar_utilizadores()
-
-    def bloquear_tarefa(self):
-        index = self.lista_tarefas.currentRow()
-        if index >= 0:
-            tarefa = self.tarefas[index]
-            tarefa.bloqueada = not tarefa.bloqueada
-            guardar_tarefas(self.tarefas)
-            estado = "bloqueada" if tarefa.bloqueada else "desbloqueada"
-            QMessageBox.information(
-                self, "Estado", f"Tarefa {estado} com sucesso.")
-            self.atualizar_lista()

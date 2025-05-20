@@ -27,7 +27,7 @@
         "prazo": "2025-04-12",
         "concluida": false,
         "utilizador": "Daniel",
-        "bloqueada": false
+        "bloqueada": true
     },
     {
         "id": 4,
