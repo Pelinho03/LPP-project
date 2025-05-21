@@ -223,7 +223,12 @@ class GestorTarefas(QWidget):
             lock = "[🔒]" if getattr(tarefa, "bloqueada", False) else ""
             prazo = tarefa.prazo if tarefa.prazo else "Sem prazo"
             self.lista_tarefas.addItem(
-                f"{lock} {status} {tarefa.titulo} - {tarefa.prioridade} - {prazo}")
+                f"{tarefa.id:02d} | {lock}{status} "
+                f"{tarefa.titulo} "
+                f"[{tarefa.prioridade}] "
+                f"({tarefa.utilizador.nome if tarefa.utilizador else 'Sem utilizador'}) "
+                f"- Prazo: {prazo}"
+            )
 
     def estado_tarefa(self, tarefa):
         return "Bloqueada" if getattr(tarefa, "bloqueada", False) else "Desbloqueada"

@@ -21,6 +21,18 @@ Se o utilizador introduzir um email válido:
         Apresentar mensagem de erro "Utilizador não encontrado"
 ```
 
+**Notificações**
+
+```
+Ao criar tarefa de prioridade "Alta":
+    Enviar notificação ao utilizador responsável
+
+Ao abrir a interface de administração (GestorTarefas):
+    Para cada tarefa com prazo a expirar em 1 dia:
+        Se a tarefa não está concluída:
+            Enviar email de aviso ao utilizador responsável
+```
+
 **Interface de Administração (GestorTarefas)**
 
 ```
@@ -30,6 +42,10 @@ Ao abrir:
         - Formulário para criar tarefas
         - Lista de tarefas existentes
         - Opções para editar, remover, concluir, bloquear/desbloquear, ordenar e pesquisar tarefas
+    Verificar prazos de tarefas:
+        Para cada tarefa com prazo a expirar em 1 dia:
+            Se não está concluída:
+                Enviar email de aviso ao utilizador responsável
 
 Ao criar tarefa:
     Ler dados do formulário
@@ -37,6 +53,8 @@ Ao criar tarefa:
     Associar tarefa a um utilizador
     Adicionar tarefa à lista
     Guardar lista de tarefas no ficheiro JSON
+    Se a tarefa for desbloqueada:
+        Enviar email ao utilizador responsável com os detalhes da tarefa
     Atualizar lista apresentada
 
 Ao editar/remover/concluir tarefa:
@@ -66,6 +84,8 @@ Ao criar utilizador:
 Ao abrir:
     Carregar lista de tarefas associadas ao utilizador autenticado
     Apresentar lista de tarefas, visor de detalhes e opções de ordenação/conclusão
+    Se existir pelo menos uma tarefa desbloqueada:
+        Enviar email ao utilizador a informar que tem tarefas disponíveis
 
 Ao marcar tarefa como concluída:
     Identificar tarefa selecionada
