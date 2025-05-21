@@ -29,7 +29,7 @@ Ao abrir:
     Apresentar painel com:
         - Formulário para criar tarefas
         - Lista de tarefas existentes
-        - Opções para editar, remover, concluir, ordenar e pesquisar tarefas
+        - Opções para editar, remover, concluir, bloquear/desbloquear, ordenar e pesquisar tarefas
 
 Ao criar tarefa:
     Ler dados do formulário
@@ -42,6 +42,13 @@ Ao criar tarefa:
 Ao editar/remover/concluir tarefa:
     Identificar tarefa selecionada
     Aplicar alteração
+    Se marcar como concluída:
+        Desbloquear automaticamente a próxima tarefa bloqueada (se existir)
+    Guardar lista de tarefas no ficheiro JSON
+    Atualizar lista apresentada
+
+Ao bloquear/desbloquear tarefa:
+    Alterar estado de bloqueio da tarefa selecionada
     Guardar lista de tarefas no ficheiro JSON
     Atualizar lista apresentada
 
@@ -60,9 +67,16 @@ Ao abrir:
     Carregar lista de tarefas associadas ao utilizador autenticado
     Apresentar lista de tarefas, visor de detalhes e opções de ordenação/conclusão
 
-Ao marcar/desmarcar tarefa como concluída:
+Ao marcar tarefa como concluída:
     Identificar tarefa selecionada
     Alterar estado de conclusão
+    Desbloquear automaticamente a próxima tarefa bloqueada do utilizador (se existir)
+    Guardar lista de tarefas no ficheiro JSON
+    Atualizar lista apresentada
+
+Ao desmarcar tarefa:
+    Identificar tarefa selecionada
+    Alterar estado de conclusão para não concluída
     Guardar lista de tarefas no ficheiro JSON
     Atualizar lista apresentada
 
