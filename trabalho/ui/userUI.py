@@ -3,6 +3,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap
 from tarefa.tarefa_json import carregar_tarefas, guardar_tarefas
 from user.user_json import carregar_utilizadores
+from notificações.email_utils import enviar_email
 import os
 
 
@@ -156,6 +157,23 @@ class UserUI(QWidget):
             prazo = tarefa.prazo if tarefa.prazo else "Sem prazo"
             self.lista_tarefas.addItem(
                 f"{lock} {status} {tarefa.titulo} - {tarefa.prioridade} - {prazo}")
+
+        if any(not t.bloqueada for t in self.tarefas_user):
+            try:
+                enviar_email(
+                    destinatario=self.utilizador_logado.email,
+                    assunto="Tens tarefas disponíveis!",
+                    mensagem=(
+                        f"Olá {self.utilizador_logado.nome},\n\n"
+                        f"Informamos que já tens pelo menos uma tarefa disponível para começar no FocusFlow.\n\n"
+                        f"Podes consultar os detalhes das tuas tarefas na aplicação e começar a trabalhar assim que quiseres.\n\n"
+                        f"Se tiveres alguma dúvida, contacta o administrador.\n\n"
+                        f"Cumprimentos,\n"
+                        f"Equipa FocusFlow"
+                    )
+                )
+            except Exception as e:
+                print(f"Erro ao enviar email: {e}")
 
     def exibir_detalhes_tarefa(self, item):
         """Exibe os detalhes da tarefa selecionada no visor."""

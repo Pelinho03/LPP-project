@@ -9,7 +9,7 @@ from tarefa.tarefa_json import carregar_tarefas, guardar_tarefas
 from tarefa.tarefa import Tarefa
 from user.user_json import carregar_utilizadores, guardar_utilizadores
 from user.user import User
-from notificações.notifications import notificar_tarefa
+from notificações.email_utils import enviar_email
 import os
 
 
@@ -193,6 +193,7 @@ class GestorTarefas(QWidget):
 
         # Atualizar o texto da equipa
         self.atualizar_equipa_trabalho()
+        self.notificar_prazos_a_expirar()
 
     def exibir_detalhes_tarefa(self, item):
         index = self.lista_tarefas.row(item)
@@ -273,12 +274,57 @@ class GestorTarefas(QWidget):
         self.atualizar_lista()
         self.notificar_tarefa(nova_tarefa)
 
+        if not nova_tarefa.bloqueada and nova_tarefa.utilizador and nova_tarefa.utilizador.email:
+            try:
+                enviar_email(
+                    destinatario=nova_tarefa.utilizador.email,
+                    assunto="Nova tarefa disponível!",
+                    mensagem=(
+                        f"Olá {nova_tarefa.utilizador.nome},\n\n"
+                        f"Foi-lhe atribuída uma nova tarefa no FocusFlow.\n\n"
+                        f"Detalhes da tarefa:\n"
+                        f"  • Título: {nova_tarefa.titulo}\n"
+                        f"  • Descrição: {nova_tarefa.descricao}\n"
+                        f"  • Prioridade: {nova_tarefa.prioridade}\n"
+                        f"  • Prazo: {nova_tarefa.prazo if nova_tarefa.prazo else 'Sem prazo definido'}\n\n"
+                        f"Por favor, aceda à aplicação para mais detalhes ou para começar a trabalhar nesta tarefa.\n\n"
+                        f"Caso tenha dúvidas, contacte o administrador.\n\n"
+                        f"Cumprimentos,\n"
+                        f"Equipa FocusFlow"
+                    )
+                )
+            except Exception as e:
+                print(f"Erro ao enviar email: {e}")
+
         self.campo_titulo.clear()
         self.campo_descricao.clear()
         self.campo_prazo.clear()
 
     def notificar_tarefa(self, tarefa):
         print(f"Notificando tarefa: {tarefa.titulo}")
+
+    def notificar_prazos_a_expirar(self):
+        hoje = datetime.date.today()
+        for tarefa in self.tarefas:
+            if tarefa.prazo and not tarefa.concluida:
+                try:
+                    prazo_data = datetime.datetime.strptime(
+                        tarefa.prazo, "%Y-%m-%d").date()
+                    dias_restantes = (prazo_data - hoje).days
+                    if dias_restantes == 1 and tarefa.utilizador and tarefa.utilizador.email:
+                        enviar_email(
+                            destinatario=tarefa.utilizador.email,
+                            assunto="Prazo de tarefa a expirar!",
+                            mensagem=(
+                                f"Olá {tarefa.utilizador.nome},\n\n"
+                                f"O prazo da tarefa '{tarefa.titulo}' termina amanhã ({tarefa.prazo}).\n"
+                                f"Por favor, verifique o seu progresso na aplicação.\n\n"
+                                f"Cumprimentos,\n"
+                                f"Equipa FocusFlow"
+                            )
+                        )
+                except Exception as e:
+                    print(f"Erro ao notificar prazo: {e}")
 
     def remover_tarefa(self):
         index = self.lista_tarefas.currentRow()
