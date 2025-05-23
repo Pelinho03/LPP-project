@@ -369,6 +369,8 @@ class GestorTarefas(QWidget):
         index = self.lista_tarefas.currentRow()
         if index >= 0:
             tarefa = self.tarefas[index]
+        else:
+            return
 
         if tarefa.bloqueada:
             QMessageBox.warning(
@@ -385,28 +387,48 @@ class GestorTarefas(QWidget):
         else:
             self.campo_prazo.setDate(QDate.currentDate())
 
-            # Remover botão antigo, se existir
-            if hasattr(self, 'btn_salvar_edicao'):
-                self.btn_salvar_edicao.setParent(None)
-                self.btn_salvar_edicao.deleteLater()
+        # Remover botão antigo, se existir
+        if hasattr(self, 'btn_salvar_edicao'):
+            self.btn_salvar_edicao.setParent(None)
+            self.btn_salvar_edicao.deleteLater()
 
-            # Criar botão de salvar edição
-            self.btn_salvar_edicao = QPushButton("Salvar Edição")
-            self.layout().addWidget(self.btn_salvar_edicao)
+        # Criar botão de salvar edição
+        self.btn_salvar_edicao = QPushButton("Salvar Edição")
+        self.layout().addWidget(self.btn_salvar_edicao)
 
-            def salvar_edicao():
-                tarefa.titulo = self.campo_titulo.text()
-                tarefa.descricao = self.campo_descricao.toPlainText()
-                tarefa.prioridade = self.campo_prioridade.currentText()
-                tarefa.prazo = self.campo_prazo.date().toString(
-                    "yyyy-MM-dd") if self.campo_prazo.date().isValid() else ""
-                guardar_tarefas(self.tarefas)
-                self.atualizar_lista()
-                QMessageBox.information(
-                    self, "Sucesso", "Tarefa editada com sucesso!")
-                self.btn_salvar_edicao.hide()  # Esconde o botão depois de salvar
+        def salvar_edicao():
+            tarefa.titulo = self.campo_titulo.text()
+            tarefa.descricao = self.campo_descricao.toPlainText()
+            tarefa.prioridade = self.campo_prioridade.currentText()
+            tarefa.prazo = self.campo_prazo.date().toString(
+                "yyyy-MM-dd") if self.campo_prazo.date().isValid() else ""
+            guardar_tarefas(self.tarefas)
+            self.atualizar_lista()
+            QMessageBox.information(
+                self, "Sucesso", "Tarefa editada com sucesso!")
+            self.btn_salvar_edicao.hide()
+            if tarefa.utilizador and tarefa.utilizador.email:
+                try:
+                    enviar_email(
+                        destinatario=tarefa.utilizador.email,
+                        assunto="Tarefa atualizada no FocusFlow",
+                        mensagem=(
+                            f"Olá {tarefa.utilizador.nome},\n\n"
+                            f"A tarefa '{tarefa.titulo}' foi atualizada pelo administrador.\n\n"
+                            f"Novos detalhes da tarefa:\n"
+                            f"  • Título: {tarefa.titulo}\n"
+                            f"  • Descrição: {tarefa.descricao}\n"
+                            f"  • Prioridade: {tarefa.prioridade}\n"
+                            f"  • Prazo: {tarefa.prazo if tarefa.prazo else 'Sem prazo definido'}\n\n"
+                            f"Por favor, aceda à aplicação para mais detalhes.\n\n"
+                            f"Cumprimentos,\n"
+                            f"Equipa FocusFlow"
+                        )
+                    )
+                except Exception as e:
+                    print(f"Erro ao enviar email de atualização: {e}")
 
-            self.btn_salvar_edicao.clicked.connect(salvar_edicao)
+        self.btn_salvar_edicao.clicked.connect(salvar_edicao)
 
     def ordenar_por_prioridade(self):
         prioridades = {"Alta": 0, "Média": 1, "Baixa": 2}
