@@ -1,6 +1,6 @@
 import datetime
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QPushButton, QListWidget,
-                             QHBoxLayout, QLineEdit, QTextEdit, QComboBox, QDateEdit, QMessageBox, QInputDialog, QLabel, QSpacerItem, QSizePolicy,QMessageBox
+                             QHBoxLayout, QLineEdit, QTextEdit, QComboBox, QDateEdit, QMessageBox, QInputDialog, QLabel, QSpacerItem, QSizePolicy,
                              )
 from PyQt6.QtCore import Qt
 from PyQt6.QtCore import QDate
@@ -9,7 +9,7 @@ from tarefa.tarefa_json import carregar_tarefas, guardar_tarefas
 from tarefa.tarefa import Tarefa
 from user.user_json import carregar_utilizadores, guardar_utilizadores
 from user.user import User
-from notificações.notifications import notificar_tarefa
+from notificações.email_utils import enviar_email
 import os
 
 
@@ -163,7 +163,6 @@ class GestorTarefas(QWidget):
         self.btn_bloquear.clicked.connect(self.bloquear_tarefa)
         botoes_layout.addWidget(self.btn_bloquear)
 
-
         coluna_lista_tarefas.addLayout(botoes_layout)
 
         # Botões de ordenação
@@ -194,6 +193,7 @@ class GestorTarefas(QWidget):
 
         # Atualizar o texto da equipa
         self.atualizar_equipa_trabalho()
+        self.notificar_prazos_a_expirar()
 
     def exibir_detalhes_tarefa(self, item):
         index = self.lista_tarefas.row(item)
@@ -201,6 +201,7 @@ class GestorTarefas(QWidget):
         detalhes = (
             f"Id: {tarefa.id}\n"
             f"Título: {tarefa.titulo}\n"
+            f"Estado: {self.estado_tarefa(tarefa)}\n"
             f"-----------------------------------------------------------\n"
             f"Descrição: {tarefa.descricao}\n"
             f"-----------------------------------------------------------\n"
@@ -224,6 +225,8 @@ class GestorTarefas(QWidget):
             self.lista_tarefas.addItem(
                 f"{lock} {status} {tarefa.titulo} - {tarefa.prioridade} - {prazo}")
 
+    def estado_tarefa(self, tarefa):
+        return "Bloqueada" if getattr(tarefa, "bloqueada", False) else "Desbloqueada"
 
     def pesquisar_tarefa(self):
         texto_pesquisa = self.campo_pesquisa.text()
@@ -271,12 +274,57 @@ class GestorTarefas(QWidget):
         self.atualizar_lista()
         self.notificar_tarefa(nova_tarefa)
 
+        if not nova_tarefa.bloqueada and nova_tarefa.utilizador and nova_tarefa.utilizador.email:
+            try:
+                enviar_email(
+                    destinatario=nova_tarefa.utilizador.email,
+                    assunto="Nova tarefa disponível!",
+                    mensagem=(
+                        f"Olá {nova_tarefa.utilizador.nome},\n\n"
+                        f"Foi-lhe atribuída uma nova tarefa no FocusFlow.\n\n"
+                        f"Detalhes da tarefa:\n"
+                        f"  • Título: {nova_tarefa.titulo}\n"
+                        f"  • Descrição: {nova_tarefa.descricao}\n"
+                        f"  • Prioridade: {nova_tarefa.prioridade}\n"
+                        f"  • Prazo: {nova_tarefa.prazo if nova_tarefa.prazo else 'Sem prazo definido'}\n\n"
+                        f"Por favor, aceda à aplicação para mais detalhes ou para começar a trabalhar nesta tarefa.\n\n"
+                        f"Caso tenha dúvidas, contacte o administrador.\n\n"
+                        f"Cumprimentos,\n"
+                        f"Equipa FocusFlow"
+                    )
+                )
+            except Exception as e:
+                print(f"Erro ao enviar email: {e}")
+
         self.campo_titulo.clear()
         self.campo_descricao.clear()
         self.campo_prazo.clear()
 
     def notificar_tarefa(self, tarefa):
         print(f"Notificando tarefa: {tarefa.titulo}")
+
+    def notificar_prazos_a_expirar(self):
+        hoje = datetime.date.today()
+        for tarefa in self.tarefas:
+            if tarefa.prazo and not tarefa.concluida:
+                try:
+                    prazo_data = datetime.datetime.strptime(
+                        tarefa.prazo, "%Y-%m-%d").date()
+                    dias_restantes = (prazo_data - hoje).days
+                    if dias_restantes == 1 and tarefa.utilizador and tarefa.utilizador.email:
+                        enviar_email(
+                            destinatario=tarefa.utilizador.email,
+                            assunto="Prazo de tarefa a expirar!",
+                            mensagem=(
+                                f"Olá {tarefa.utilizador.nome},\n\n"
+                                f"O prazo da tarefa '{tarefa.titulo}' termina amanhã ({tarefa.prazo}).\n"
+                                f"Por favor, verifique o seu progresso na aplicação.\n\n"
+                                f"Cumprimentos,\n"
+                                f"Equipa FocusFlow"
+                            )
+                        )
+                except Exception as e:
+                    print(f"Erro ao notificar prazo: {e}")
 
     def remover_tarefa(self):
         index = self.lista_tarefas.currentRow()
@@ -292,14 +340,23 @@ class GestorTarefas(QWidget):
             tarefa.bloqueada = not tarefa.bloqueada
             guardar_tarefas(self.tarefas)
             estado = "bloqueada" if tarefa.bloqueada else "desbloqueada"
-            QMessageBox.information(self, "Estado da Tarefa", f"Tarefa {estado} com sucesso.")
+            QMessageBox.information(
+                self, "Estado da Tarefa", f"Tarefa {estado} com sucesso.")
             self.atualizar_lista()
-
 
     def marcar_concluida(self):
         index = self.lista_tarefas.currentRow()
         if index >= 0:
             self.tarefas[index].concluida = True
+            # Desbloquear a próxima tarefa bloqueada (se existir)
+            for i in range(index + 1, len(self.tarefas)):
+                if getattr(self.tarefas[i], "bloqueada", False):
+                    self.tarefas[i].bloqueada = False
+                    QMessageBox.information(
+                        self, "Desbloqueada",
+                        f"A tarefa '{self.tarefas[i].titulo}' foi desbloqueada!"
+                    )
+                    break  # Só desbloqueia a próxima bloqueada
             guardar_tarefas(self.tarefas)
             self.atualizar_lista()
 
@@ -308,19 +365,20 @@ class GestorTarefas(QWidget):
         if index >= 0:
             tarefa = self.tarefas[index]
 
-        if tarefa.bloqueada:
-            QMessageBox.warning(self, "Acesso negado", "Esta tarefa está bloqueada e não pode ser editada.")
-            return
+            if tarefa.bloqueada:
+                QMessageBox.warning(
+                    self, "Acesso negado", "Esta tarefa está bloqueada e não pode ser editada.")
+                return
 
-        self.campo_titulo.setText(tarefa.titulo)
-        self.campo_descricao.setText(tarefa.descricao)
-        self.campo_prioridade.setCurrentText(tarefa.prioridade)
+            self.campo_titulo.setText(tarefa.titulo)
+            self.campo_descricao.setText(tarefa.descricao)
+            self.campo_prioridade.setCurrentText(tarefa.prioridade)
 
-        if tarefa.prazo:
-            data = datetime.datetime.strptime(tarefa.prazo, "%Y-%m-%d")
-            self.campo_prazo.setDate(QDate(data.year, data.month, data.day))
-        else:
-            self.campo_prazo.setDate(QDate.currentDate())
+            if tarefa.prazo:
+                data = datetime.datetime.strptime(tarefa.prazo, "%Y-%m-%d")
+                self.campo_prazo.setDate(QDate(data.year, data.month, data.day))
+            else:
+                self.campo_prazo.setDate(QDate.currentDate())
 
             # Remover botão antigo, se existir
             if hasattr(self, 'btn_salvar_edicao'):
@@ -330,7 +388,6 @@ class GestorTarefas(QWidget):
             # Criar botão de salvar edição
             self.btn_salvar_edicao = QPushButton("Salvar Edição")
             self.layout().addWidget(self.btn_salvar_edicao)
-
 
             def salvar_edicao():
                 tarefa.titulo = self.campo_titulo.text()
@@ -366,50 +423,51 @@ class GestorTarefas(QWidget):
             self.campo_utilizador.addItem(user.nome)
 
     def criar_utilizador(self):
-        nome, ok_nome = QInputDialog.getText(
-            self, "Criar Utilizador", "Nome do Utilizador:")
-        if not ok_nome or not nome.strip():
-            QMessageBox.warning(
-                self, "Erro", "O nome do Utilizador não pode estar vazio.")
-            return
+            nome, ok_nome = QInputDialog.getText(
+                self, "Criar Utilizador", "Nome do Utilizador:")
+            if not ok_nome or not nome.strip():
+                QMessageBox.warning(
+                    self, "Erro", "O nome do Utilizador não pode estar vazio.")
+                return
 
-        email, ok_email = QInputDialog.getText(
-            self, "Criar Utilizador", "Email do Utilizador:")
-        if not ok_email or not email.strip():
-            QMessageBox.warning(
-                self, "Erro", "O email do Utilizador não pode estar vazio.")
-            return
+            email, ok_email = QInputDialog.getText(
+                self, "Criar Utilizador", "Email do Utilizador:")
+            if not ok_email or not email.strip():
+                QMessageBox.warning(
+                    self, "Erro", "O email do Utilizador não pode estar vazio.")
+                return
 
-        grupo, ok_grupo = QInputDialog.getItem(
-            self, "Grupo do Utilizador", "Selecione o grupo:",
-            ["admin", "desenvolvedores", "design"], 0, False
-        )
-        if not ok_grupo:
-            return
+            grupo, ok_grupo = QInputDialog.getItem(
+                self, "Grupo do Utilizador", "Selecione o grupo:",
+                ["admin", "developer", "designer"], 0, False
+            )
+            if not ok_grupo:
+                return
+
+            # Verificar se já existe utilizador com este email
+            if any(u.email == email.strip() for u in self.utilizadores):
+                QMessageBox.warning(self, "Erro", "Já existe um utilizador com este email.")
+                return
+
+            # Criar e guardar o novo utilizador
+            novo_user = User(nome.strip(), email.strip(), grupo)
+            self.utilizadores.append(novo_user)
+            guardar_utilizadores(self.utilizadores)
+            self.atualizar_utilizadores()
+
+            QMessageBox.information(self, "Sucesso", f"Utilizador '{nome}' criado com sucesso.")
+
 
     def atualizar_equipa_trabalho(self):
-        user = self.utilizador_logado
-        if user.grupo == "admin":
-            self.equipa_label.setText("Admin Panel")
-        elif user.grupo == "developer":
-            self.equipa_label.setText("Developer Team")
-        elif user.grupo == "designer":
-            self.equipa_label.setText("Designer Team")
-        else:
-            self.equipa_label.setText("Equipe desconhecida")
+            user = self.utilizador_logado
+            if user.grupo == "admin":
+                self.equipa_label.setText("Admin Panel")
+            elif user.grupo == "developer":
+                self.equipa_label.setText("Developer Team")
+            elif user.grupo == "designer":
+                self.equipa_label.setText("Designer Team")
+            else:
+                self.equipa_label.setText("Equipe desconhecida")
 
-        # novo_user = User(nome.strip(), email.strip(), grupo)
-        # self.utilizadores.append(novo_user)
-        guardar_utilizadores(self.utilizadores)
-        self.atualizar_utilizadores()
-
-
-def bloquear_tarefa(self):
-    index = self.lista_tarefas.currentRow()
-    if index >= 0:
-        tarefa = self.tarefas[index]
-        tarefa.bloqueada = not tarefa.bloqueada
-        guardar_tarefas(self.tarefas)
-        estado = "bloqueada" if tarefa.bloqueada else "desbloqueada"
-        QMessageBox.information(self, "Estado", f"Tarefa {estado} com sucesso.")
-        self.atualizar_lista()
+            guardar_utilizadores(self.utilizadores)
+            self.atualizar_utilizadores()
