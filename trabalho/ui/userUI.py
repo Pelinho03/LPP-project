@@ -211,7 +211,9 @@ class UserUI(QWidget):
             status = "[✔]" if tarefa.concluida else "[ ]"
             prazo = tarefa.prazo if tarefa.prazo else "Sem prazo"
             self.lista_tarefas.addItem(
-                f"{lock} {status} {tarefa.titulo} - {tarefa.prioridade} - {prazo}")
+                f"{tarefa.id:02d} | {lock}{status} {tarefa.titulo} "
+                f"[{tarefa.prioridade}] - Prazo: {prazo}"
+            )
 
     def estado_tarefa(self, tarefa):
         return "Bloqueada" if getattr(tarefa, "bloqueada", False) else "Desbloqueada"
