@@ -13,6 +13,7 @@ class LoginUI(QWidget):
 
         self.setWindowTitle("FocusFlow | Login")
 
+        # Carrega e aplica o ficheiro de estilos (QSS)
         current_dir = os.path.dirname(os.path.abspath(__file__))
         qss_path = os.path.join(current_dir, "../styles/style.qss")
 
@@ -26,11 +27,11 @@ class LoginUI(QWidget):
 
         layout = QVBoxLayout()
 
-        # Espaçador para empurrar tudo mais para o centro
+        # Espaçador para centralizar verticalmente
         layout.addSpacerItem(QSpacerItem(
             20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
 
-        # Imagem
+        # Logo da aplicação
         self.image = QLabel()
         logo_dir = os.path.dirname(os.path.abspath(__file__))
         assets_path = os.path.join(
@@ -41,11 +42,11 @@ class LoginUI(QWidget):
         self.image.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         layout.addWidget(self.image)
 
-        # Pequeno espaçador entre imagem e campos
+        # Espaço entre a imagem e os campos
         layout.addSpacerItem(QSpacerItem(
             20, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed))
 
-        # Campo de email
+        # Campo de introdução do email
         self.campo_email = QLineEdit()
         self.campo_email.setPlaceholderText("Email")
         self.campo_email.setFixedWidth(300)
@@ -63,13 +64,13 @@ class LoginUI(QWidget):
         button_container.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         layout.addLayout(button_container)
 
-        # Espaçador para preencher o fundo
+        # Espaçador para empurrar o conteúdo para o centro
         layout.addSpacerItem(QSpacerItem(
             20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
 
-        # Configurar layout principal
         self.setLayout(layout)
 
+    # Verifica se o email introduzido corresponde a um utilizador registado
     def verificar_login(self):
         email = self.campo_email.text().strip()
         utilizadores = carregar_utilizadores()
@@ -79,16 +80,19 @@ class LoginUI(QWidget):
             QMessageBox.warning(self, "Erro", "Utilizador não encontrado!")
             return
 
+        # Redireciona para a interface adequada consoante o tipo de utilizador
         if user.grupo == "admin":
             self.abrir_ui_admin(user)
         else:
             self.abrir_ui_user(user)
 
+    # Abre a interface de administração
     def abrir_ui_admin(self, user):
         self.ui_admin = GestorTarefas(user)
         self.ui_admin.show()
         self.close()
 
+    # Abre a interface de utilizador comum
     def abrir_ui_user(self, user):
         self.ui_user = UserUI(user)
         self.ui_user.show()
